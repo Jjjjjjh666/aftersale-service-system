@@ -1,0 +1,58 @@
+### ============================================
+### 售后模块API测试 - 验证多态行为
+### ============================================
+
+### 测试1：换货审核（type=0，使用ExchangeConfirmStrategy）
+PUT http://localhost:8081/shops/1/aftersaleorders/3/confirm
+Content-Type: application/json
+
+{
+  "confirm": true,
+  "conclusion": "同意换货，请等待新商品发出"
+}
+
+### 测试2：退货审核（type=1，使用ReturnConfirmStrategy）
+PUT http://localhost:8081/shops/1/aftersaleorders/2/confirm
+Content-Type: application/json
+
+{
+  "confirm": true,
+  "conclusion": "同意退货，请寄回商品"
+}
+
+### 测试3：维修审核（type=2，使用RepairConfirmStrategy）
+### 注意：这个会跨模块调用service创建服务单！
+PUT http://localhost:8081/shops/1/aftersaleorders/1/confirm
+Content-Type: application/json
+
+{
+  "confirm": true,
+  "conclusion": "同意维修，将创建服务单"
+}
+
+### 测试4：拒绝售后
+PUT http://localhost:8081/shops/1/aftersaleorders/4/confirm
+Content-Type: application/json
+
+{
+  "confirm": false,
+  "conclusion": "商品无质量问题，拒绝售后"
+}
+
+### ============================================
+### 查看数据验证
+### ============================================
+
+### 查询售后单状态（如果有查询接口）
+# GET http://localhost:8081/shops/1/aftersaleorders/1
+
+### ============================================
+### 健康检查
+### ============================================
+
+### Aftersale模块健康检查
+GET http://localhost:8081/actuator/health
+
+### Service模块健康检查
+GET http://localhost:8082/actuator/health
+
