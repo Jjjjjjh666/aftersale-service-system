@@ -1,0 +1,5 @@
+cn/edu/xmu/aftersale/controller/AftersaleControllerTest.class
+cn/edu/xmu/aftersale/model/AftersaleOrderTest.class
+cn/edu/xmu/aftersale/model/strategy/AftersaleStrategyTest.class
+cn/edu/xmu/aftersale/AftersaleApplicationTest.class
+cn/edu/xmu/aftersale/service/AftersaleServiceTest.class

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceOrderInternalController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.controller</a> &gt; <span class="el_source">ServiceOrderInternalController.java</span></div><h1>ServiceOrderInternalController.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.controller;
+
+import cn.edu.xmu.common.model.ReturnNo;
+import cn.edu.xmu.common.model.ReturnObject;
+import cn.edu.xmu.service.controller.dto.CreateServiceOrderRequest;
+import cn.edu.xmu.service.service.ServiceOrderService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 服务单内部接口控制器
+ * 供aftersale模块调用
+ */
+<span class="fc" id="L18">@Slf4j</span>
+@RestController
+@RequestMapping(&quot;/internal/shops/{shopId}/aftersales/{aftersalesId}&quot;)
+@RequiredArgsConstructor
+public class ServiceOrderInternalController {
+
+    private final ServiceOrderService serviceOrderService;
+
+    /**
+     * 创建服务单（内部接口）
+     * POST /internal/shops/{shopId}/aftersales/{aftersalesId}/serviceorders
+     */
+    @PostMapping(&quot;/serviceorders&quot;)
+    public ReturnObject createServiceOrder(
+            @PathVariable Long shopId,
+            @PathVariable Long aftersalesId,
+            @RequestBody(required = false) CreateServiceOrderRequest request) {
+        
+<span class="fc" id="L36">        log.info(&quot;内部接口-创建服务单: shopId={}, aftersalesId={}&quot;, shopId, aftersalesId);</span>
+        
+<span class="pc bpc" id="L38" title="1 of 4 branches missed.">        Integer type = (request != null &amp;&amp; request.getType() != null) ? request.getType() : 0;</span>
+<span class="fc" id="L39">        String consignee = &quot;&quot;;</span>
+<span class="pc bpc" id="L40" title="1 of 4 branches missed.">        if (request != null &amp;&amp; request.getConsignee() != null) {</span>
+<span class="fc" id="L41">            consignee = request.getConsignee().getName();</span>
+        }
+        
+<span class="fc" id="L44">        Long serviceOrderId = serviceOrderService.createServiceOrder(shopId, aftersalesId, type, consignee);</span>
+        
+<span class="fc" id="L46">        Map&lt;String, Object&gt; data = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L47">        data.put(&quot;id&quot;, serviceOrderId);</span>
+<span class="fc" id="L48">        data.put(&quot;type&quot;, type);</span>
+        
+<span class="fc" id="L50">        return new ReturnObject(data);</span>
+    }
+
+    /**
+     * 取消服务单（内部接口）
+     * DELETE /internal/shops/{shopId}/aftersales/{aftersalesId}/serviceorders/cancel
+     */
+    @DeleteMapping(&quot;/serviceorders/cancel&quot;)
+    public ReturnObject cancelServiceOrder(
+            @PathVariable Long shopId,
+            @PathVariable Long aftersalesId,
+            @RequestParam(&quot;reason&quot;) String reason) {
+        
+<span class="fc" id="L63">        log.info(&quot;内部接口-取消服务单: shopId={}, aftersalesId={}, reason={}&quot;, shopId, aftersalesId, reason);</span>
+        
+<span class="fc" id="L65">        serviceOrderService.cancelServiceOrderByAftersale(aftersalesId, reason);</span>
+        
+<span class="fc" id="L67">        return new ReturnObject(ReturnNo.OK);</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -35,7 +35,6 @@ public class OnsiteAcceptStrategy implements ServiceOrderAcceptStrategy {
 
     @Override
     public boolean support(Integer type) {
-        return ServiceOrderType.ONSITE.getCode().equals(type);
+        return ServiceOrderType.ONSITE_REPAIR.getCode().equals(type);
     }
 }
-

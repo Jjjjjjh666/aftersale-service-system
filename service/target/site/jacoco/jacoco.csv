@@ -1,0 +1,18 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Service Module,cn.edu.xmu.service.dao,ServiceOrderRepository,0,63,0,4,0,16,0,6,0,4
+Service Module,cn.edu.xmu.service.dao,ServiceProviderDraftRepository,57,4,4,0,15,1,5,1,3,1
+Service Module,cn.edu.xmu.service.model,ServiceOrderStatus,0,72,0,4,0,10,0,4,0,2
+Service Module,cn.edu.xmu.service.model,DraftStatus,0,56,0,4,0,8,0,4,0,2
+Service Module,cn.edu.xmu.service.model,ServiceOrder,7,146,3,7,3,46,3,10,0,8
+Service Module,cn.edu.xmu.service.model,ServiceProviderDraft,2,115,1,3,1,36,1,6,0,5
+Service Module,cn.edu.xmu.service.model,ServiceOrderType,0,59,0,4,0,8,0,4,0,2
+Service Module,cn.edu.xmu.service.model.strategy.impl,MailInAcceptStrategy,0,39,0,0,0,12,0,4,0,4
+Service Module,cn.edu.xmu.service.model.strategy.impl,MailInCancelStrategy,0,40,0,2,0,11,0,5,0,4
+Service Module,cn.edu.xmu.service.model.strategy.impl,OnsiteCancelStrategy,0,28,0,0,0,8,0,4,0,4
+Service Module,cn.edu.xmu.service.model.strategy.impl,OnsiteAcceptStrategy,0,30,0,0,0,9,0,4,0,4
+Service Module,cn.edu.xmu.service,ServiceApplication,8,0,0,0,3,0,2,0,2,0
+Service Module,cn.edu.xmu.service.controller,ServiceProviderController,0,23,0,0,0,5,0,2,0,2
+Service Module,cn.edu.xmu.service.controller,ServiceProviderOrderController,0,34,0,0,0,7,0,3,0,3
+Service Module,cn.edu.xmu.service.controller,ServiceOrderInternalController,0,86,2,6,0,14,2,5,0,3
+Service Module,cn.edu.xmu.service.service,ServiceOrderService,17,152,1,1,0,38,3,7,2,7
+Service Module,cn.edu.xmu.service.service,ServiceProviderService,1,78,1,7,0,18,1,6,0,3

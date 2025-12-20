@@ -36,4 +36,3 @@ public enum ReturnNo {
         this.message = message;
     }
 }
-

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MailInCancelStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.model.strategy.impl</a> &gt; <span class="el_source">MailInCancelStrategy.java</span></div><h1>MailInCancelStrategy.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.model.strategy.impl;
+
+import cn.edu.xmu.service.model.ServiceOrder;
+import cn.edu.xmu.service.model.ServiceOrderType;
+import cn.edu.xmu.service.model.strategy.ServiceOrderCancelStrategy;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+/**
+ * 寄修取消策略
+ * 取消时需要处理物流和退货
+ */
+<span class="fc" id="L13">@Slf4j</span>
+@Component
+<span class="fc" id="L15">public class MailInCancelStrategy implements ServiceOrderCancelStrategy {</span>
+
+    @Override
+    public void cancel(ServiceOrder order) {
+<span class="fc" id="L19">        log.info(&quot;执行寄修取消策略: orderId={}&quot;, order.getId());</span>
+        
+        // 取消服务单
+<span class="fc" id="L22">        order.cancel();</span>
+        
+        // 寄修取消特定逻辑
+<span class="fc" id="L25">        log.info(&quot;寄修服务单已取消: orderId={}&quot;, order.getId());</span>
+        
+        // 根据物流状态判断后续处理
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (order.getTrackingNumber() != null) {</span>
+<span class="fc" id="L29">            log.info(&quot;商品已寄出，物流单号: {}&quot;, order.getTrackingNumber());</span>
+<span class="fc" id="L30">            log.info(&quot;后续需要: 1.拦截物流 2.安排退回 3.通知客户&quot;);</span>
+        } else {
+<span class="fc" id="L32">            log.info(&quot;商品未寄出，直接通知客户取消即可&quot;);</span>
+        }
+        
+        // 实际业务中可能需要：
+        // 1. 检查物流状态
+        // 2. 如果商品在途中，联系物流拦截
+        // 3. 如果商品已到达，安排退回
+        // 4. 通知客户取消信息
+        // 5. 处理可能产生的物流费用
+<span class="fc" id="L41">    }</span>
+
+    @Override
+    public boolean support(Integer type) {
+<span class="fc" id="L45">        return ServiceOrderType.MAIL_IN_REPAIR.getCode().equals(type);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

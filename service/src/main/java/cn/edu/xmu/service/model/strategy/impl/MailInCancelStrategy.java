@@ -42,7 +42,6 @@ public class MailInCancelStrategy implements ServiceOrderCancelStrategy {
 
     @Override
     public boolean support(Integer type) {
-        return ServiceOrderType.MAIL_IN.getCode().equals(type);
+        return ServiceOrderType.MAIL_IN_REPAIR.getCode().equals(type);
     }
 }
-

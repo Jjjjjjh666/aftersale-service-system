@@ -134,10 +134,18 @@ public class AftersaleOrder {
     }
 
     /**
+     * 审核拒绝，记录结论
+     */
+    public void reject(String conclusion) {
+        this.status = AftersaleStatus.CANCELLED;
+        this.conclusion = conclusion;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
      * 获取售后类型
      */
     public AftersaleType getAftersaleType() {
         return AftersaleType.valueOf(this.type);
     }
 }
-

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AftersaleController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Aftersale Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.aftersale.controller</a> &gt; <span class="el_source">AftersaleController.java</span></div><h1>AftersaleController.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.aftersale.controller;
+
+import cn.edu.xmu.aftersale.controller.dto.CancelAftersaleRequest;
+import cn.edu.xmu.aftersale.controller.dto.ConfirmAftersaleRequest;
+import cn.edu.xmu.aftersale.service.AftersaleService;
+import cn.edu.xmu.common.model.ReturnNo;
+import cn.edu.xmu.common.model.ReturnObject;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 售后控制器
+ */
+<span class="fc" id="L20">@Slf4j</span>
+@RestController
+@RequestMapping(&quot;/shops/{shopid}&quot;)
+@RequiredArgsConstructor
+@Validated
+public class AftersaleController {
+
+    private final AftersaleService aftersaleService;
+
+    /**
+     * 商户审核售后
+     * PUT /shops/{shopid}/aftersaleorders/{id}/confirm
+     */
+    @PutMapping(&quot;/aftersaleorders/{id}/confirm&quot;)
+    public ReturnObject confirmAftersale(
+            @PathVariable(&quot;shopid&quot;) Long shopId,
+            @PathVariable(&quot;id&quot;) Long id,
+            @Valid @RequestBody ConfirmAftersaleRequest request) {
+        
+<span class="fc" id="L39">        log.info(&quot;商户审核售后API: shopId={}, id={}, confirm={}&quot;, shopId, id, request.getConfirm());</span>
+        
+<span class="fc" id="L41">        String status = aftersaleService.confirmAftersale(</span>
+<span class="fc" id="L42">                shopId, id, request.getConfirm(), request.getConclusion());</span>
+        
+<span class="fc" id="L44">        Map&lt;String, Object&gt; data = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L45">        data.put(&quot;errno&quot;, ReturnNo.OK.getCode());</span>
+<span class="fc" id="L46">        data.put(&quot;errmsg&quot;, ReturnNo.OK.getMessage());</span>
+<span class="fc" id="L47">        data.put(&quot;status&quot;, status);</span>
+        
+<span class="fc" id="L49">        return new ReturnObject(data);</span>
+    }
+
+    /**
+     * 商户取消售后单
+     * DELETE /shops/{shopid}/aftersaleorders/{id}/cancel
+     */
+    @DeleteMapping(&quot;/aftersaleorders/{id}/cancel&quot;)
+    public ReturnObject cancelAftersale(
+            @PathVariable(&quot;shopid&quot;) Long shopId,
+            @PathVariable(&quot;id&quot;) Long id,
+            @Valid @RequestBody CancelAftersaleRequest request) {
+        
+<span class="fc" id="L62">        log.info(&quot;商户取消售后API: shopId={}, id={}, reason={}&quot;, shopId, id, request.getReason());</span>
+        
+        // 需要confirm=true才能取消
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (!Boolean.TRUE.equals(request.getConfirm())) {</span>
+<span class="fc" id="L66">            return ReturnObject.error(ReturnNo.BAD_REQUEST, &quot;confirm必须为true&quot;);</span>
+        }
+        
+<span class="fc" id="L69">        String status = aftersaleService.cancelAftersale(shopId, id, request.getReason());</span>
+        
+<span class="fc" id="L71">        Map&lt;String, Object&gt; data = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L72">        data.put(&quot;errno&quot;, ReturnNo.OK.getCode());</span>
+<span class="fc" id="L73">        data.put(&quot;errmsg&quot;, ReturnNo.OK.getMessage());</span>
+<span class="fc" id="L74">        data.put(&quot;status&quot;, status);</span>
+        
+<span class="fc" id="L76">        return new ReturnObject(data);</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

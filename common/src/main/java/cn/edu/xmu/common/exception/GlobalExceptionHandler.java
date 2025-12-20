@@ -38,4 +38,3 @@ public class GlobalExceptionHandler {
         return ReturnObject.error(ReturnNo.INTERNAL_SERVER_ERROR);
     }
 }
-

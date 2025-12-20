@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceOrderType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.model</a> &gt; <span class="el_source">ServiceOrderType.java</span></div><h1>ServiceOrderType.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+/**
+ * 服务单类型枚举
+ */
+<span class="fc" id="L9">@Getter</span>
+@AllArgsConstructor
+public enum ServiceOrderType {
+<span class="fc" id="L12">    ONSITE_REPAIR(0, &quot;上门维修&quot;),</span>
+<span class="fc" id="L13">    MAIL_IN_REPAIR(1, &quot;寄修&quot;),</span>
+<span class="fc" id="L14">    OTHER(2, &quot;其他&quot;);</span>
+
+    private final Integer code;
+    private final String description;
+
+    public static ServiceOrderType valueOf(Integer code) {
+<span class="fc bfc" id="L20" title="All 2 branches covered.">        for (ServiceOrderType type : values()) {</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">            if (type.getCode().equals(code)) {</span>
+<span class="fc" id="L22">                return type;</span>
+            }
+        }
+<span class="fc" id="L25">        throw new IllegalArgumentException(&quot;未知的服务类型: &quot; + code);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExchangeConfirmStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Aftersale Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.aftersale.model.strategy.impl</a> &gt; <span class="el_source">ExchangeConfirmStrategy.java</span></div><h1>ExchangeConfirmStrategy.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.aftersale.model.strategy.impl;
+
+import cn.edu.xmu.aftersale.model.AftersaleOrder;
+import cn.edu.xmu.aftersale.model.AftersaleType;
+import cn.edu.xmu.aftersale.model.strategy.AftersaleConfirmStrategy;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+/**
+ * 换货审核策略
+ * 审核通过后需要等待客户寄回商品，商家再发出新商品
+ */
+<span class="fc" id="L13">@Slf4j</span>
+@Component
+<span class="fc" id="L15">public class ExchangeConfirmStrategy implements AftersaleConfirmStrategy {</span>
+
+    @Override
+    public void confirm(AftersaleOrder order, Boolean confirm, String conclusion) {
+<span class="nc" id="L19">        log.info(&quot;执行换货审核策略: orderId={}, confirm={}&quot;, order.getId(), confirm);</span>
+        
+<span class="nc bnc" id="L21" title="All 2 branches missed.">        if (Boolean.TRUE.equals(confirm)) {</span>
+            // 同意换货
+<span class="nc bnc" id="L23" title="All 2 branches missed.">            order.approve(conclusion != null ? conclusion : &quot;同意换货&quot;);</span>
+<span class="nc" id="L24">            log.info(&quot;换货审核通过: orderId={}, 等待客户寄回旧商品&quot;, order.getId());</span>
+            // 后续业务：通知客户寄回地址、准备新商品库存等
+        } else {
+            // 拒绝换货
+<span class="nc bnc" id="L28" title="All 2 branches missed.">            order.approve(conclusion != null ? conclusion : &quot;拒绝换货&quot;);</span>
+<span class="nc" id="L29">            log.info(&quot;换货审核拒绝: orderId={}, reason={}&quot;, order.getId(), conclusion);</span>
+        }
+<span class="nc" id="L31">    }</span>
+
+    @Override
+    public boolean support(Integer type) {
+<span class="nc" id="L35">        return AftersaleType.EXCHANGE.getCode().equals(type);  // type=0</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceOrder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.model</a> &gt; <span class="el_source">ServiceOrder.java</span></div><h1>ServiceOrder.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.model;
+
+import cn.edu.xmu.common.exception.BusinessException;
+import cn.edu.xmu.common.model.ReturnNo;
+import cn.edu.xmu.service.dao.po.ServiceOrderPo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+/**
+ * 服务单领域对象
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ServiceOrder {
+    
+    private Long id;
+    private Long shopId;
+    private Long aftersalesId;
+    private Long serviceProviderId; // 服务商ID
+    private ServiceOrderType type;
+    private ServiceOrderStatus status;
+    private String consignee;
+    private String address; // 服务地址
+    private String trackingNumber; // 物流单号（寄修场景）
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    /**
+     * 从PO构建领域对象
+     */
+    public static ServiceOrder fromPo(ServiceOrderPo po) {
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        if (po == null) {</span>
+<span class="nc" id="L39">            return null;</span>
+        }
+<span class="fc" id="L41">        return ServiceOrder.builder()</span>
+<span class="fc" id="L42">                .id(po.getId())</span>
+<span class="fc" id="L43">                .shopId(po.getShopId())</span>
+<span class="fc" id="L44">                .aftersalesId(po.getAftersalesId())</span>
+<span class="fc" id="L45">                .serviceProviderId(po.getServiceProviderId())</span>
+<span class="fc" id="L46">                .type(ServiceOrderType.valueOf(po.getType()))</span>
+<span class="fc" id="L47">                .status(convertStatusFromString(po.getStatus()))</span>
+<span class="fc" id="L48">                .consignee(po.getConsignee())</span>
+<span class="fc" id="L49">                .address(po.getAddress())</span>
+<span class="fc" id="L50">                .trackingNumber(po.getTrackingNumber())</span>
+<span class="fc" id="L51">                .createdAt(po.getCreatedAt())</span>
+<span class="fc" id="L52">                .updatedAt(po.getUpdatedAt())</span>
+<span class="fc" id="L53">                .build();</span>
+    }
+
+    /**
+     * 转换为PO
+     */
+    public ServiceOrderPo toPo() {
+<span class="fc" id="L60">        ServiceOrderPo po = new ServiceOrderPo();</span>
+<span class="fc" id="L61">        po.setId(this.id);</span>
+<span class="fc" id="L62">        po.setShopId(this.shopId);</span>
+<span class="fc" id="L63">        po.setAftersalesId(this.aftersalesId);</span>
+<span class="fc" id="L64">        po.setServiceProviderId(this.serviceProviderId);</span>
+<span class="fc" id="L65">        po.setType(this.type.getCode());</span>
+<span class="fc" id="L66">        po.setStatus(convertStatusToString(this.status));</span>
+<span class="fc" id="L67">        po.setConsignee(this.consignee);</span>
+<span class="fc" id="L68">        po.setAddress(this.address);</span>
+<span class="fc" id="L69">        po.setTrackingNumber(this.trackingNumber);</span>
+<span class="fc" id="L70">        po.setCreatedAt(this.createdAt);</span>
+<span class="fc" id="L71">        po.setUpdatedAt(this.updatedAt);</span>
+<span class="fc" id="L72">        return po;</span>
+    }
+
+    /**
+     * 将数据库状态字符串转换为状态枚举
+     */
+    private static ServiceOrderStatus convertStatusFromString(String status) {
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if (status == null) {</span>
+<span class="nc" id="L80">            return ServiceOrderStatus.CREATED;</span>
+        }
+        try {
+<span class="fc" id="L83">            return ServiceOrderStatus.valueOf(status);</span>
+<span class="fc" id="L84">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L85">            return ServiceOrderStatus.CREATED;</span>
+        }
+    }
+
+    /**
+     * 将状态枚举转换为数据库状态字符串
+     */
+    private static String convertStatusToString(ServiceOrderStatus status) {
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (status == null) {</span>
+<span class="nc" id="L94">            return ServiceOrderStatus.CREATED.name();</span>
+        }
+<span class="fc" id="L96">        return status.name();</span>
+    }
+
+    /**
+     * 检查是否为已创建状态
+     */
+    public void checkCreatedStatus() {
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        if (!ServiceOrderStatus.CREATED.equals(this.status)) {</span>
+<span class="fc" id="L104">            throw new BusinessException(ReturnNo.STATENOTALLOW, </span>
+                    &quot;只有已创建状态的服务单才能接受&quot;);
+        }
+<span class="fc" id="L107">    }</span>
+
+    /**
+     * 检查是否为已接受状态
+     */
+    public void checkAcceptedStatus() {
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (!ServiceOrderStatus.ACCEPTED.equals(this.status)) {</span>
+<span class="fc" id="L114">            throw new BusinessException(ReturnNo.STATENOTALLOW, </span>
+                    &quot;只有已接受状态的服务单才能取消&quot;);
+        }
+<span class="fc" id="L117">    }</span>
+
+    /**
+     * 接受服务单
+     */
+    public void accept(Long serviceProviderId) {
+<span class="fc" id="L123">        this.serviceProviderId = serviceProviderId;</span>
+<span class="fc" id="L124">        this.status = ServiceOrderStatus.ACCEPTED;</span>
+<span class="fc" id="L125">        this.updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L126">    }</span>
+
+    /**
+     * 取消服务单
+     */
+    public void cancel() {
+<span class="fc" id="L132">        this.status = ServiceOrderStatus.CANCELLED;</span>
+<span class="fc" id="L133">        this.updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L134">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

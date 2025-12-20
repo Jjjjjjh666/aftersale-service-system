@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceProviderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.service</a> &gt; <span class="el_source">ServiceProviderService.java</span></div><h1>ServiceProviderService.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.service;
+
+import cn.edu.xmu.service.dao.ServiceProviderDraftRepository;
+import cn.edu.xmu.service.model.ServiceProviderDraft;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 服务商服务
+ */
+<span class="fc" id="L13">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+public class ServiceProviderService {
+
+    private final ServiceProviderDraftRepository repository;
+
+    /**
+     * 平台管理员审核服务商变更
+     * @param draftId 草稿ID
+     * @param conclusion 审核结果 0-拒绝 1-通过
+     * @param opinion 审核意见
+     */
+    @Transactional
+    public void reviewDraft(Long draftId, Integer conclusion, String opinion) {
+<span class="fc" id="L28">        log.info(&quot;开始审核服务商变更: draftId={}, conclusion={}&quot;, draftId, conclusion);</span>
+        
+        // 1. 查询草稿
+<span class="fc" id="L31">        ServiceProviderDraft draft = repository.findById(draftId);</span>
+        
+        // 2. 检查状态
+<span class="fc" id="L34">        draft.checkPendingStatus();</span>
+        
+        // 3. 执行审核
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (Integer.valueOf(1).equals(conclusion)) {</span>
+            // 审核通过
+<span class="fc bfc" id="L39" title="All 2 branches covered.">            draft.approve(opinion != null ? opinion : &quot;审核通过&quot;);</span>
+<span class="fc" id="L40">            log.info(&quot;服务商变更审核通过: draftId={}&quot;, draftId);</span>
+            
+            // 后续业务：将草稿内容应用到正式的服务商信息中
+<span class="fc" id="L43">            applyDraftToProvider(draft);</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        } else if (Integer.valueOf(0).equals(conclusion)) {</span>
+            // 审核拒绝
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">            draft.reject(opinion != null ? opinion : &quot;审核拒绝&quot;);</span>
+<span class="fc" id="L47">            log.info(&quot;服务商变更审核拒绝: draftId={}, opinion={}&quot;, draftId, opinion);</span>
+        } else {
+<span class="fc" id="L49">            throw new IllegalArgumentException(&quot;无效的审核结果: &quot; + conclusion);</span>
+        }
+        
+        // 4. 保存更新
+<span class="fc" id="L53">        repository.save(draft);</span>
+        
+<span class="fc" id="L55">        log.info(&quot;服务商变更审核完成: draftId={}, status={}&quot;, draftId, draft.getStatus());</span>
+<span class="fc" id="L56">    }</span>
+
+    /**
+     * 将草稿内容应用到正式的服务商信息
+     */
+    private void applyDraftToProvider(ServiceProviderDraft draft) {
+<span class="fc" id="L62">        log.info(&quot;应用草稿到服务商: serviceProviderId={}, draftId={}&quot;, </span>
+<span class="fc" id="L63">                draft.getServiceProviderId(), draft.getId());</span>
+        // 这里应该更新service_provider表的记录
+        // 实际项目中需要实现相应的逻辑
+<span class="fc" id="L66">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

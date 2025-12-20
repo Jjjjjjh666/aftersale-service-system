@@ -1,0 +1,10 @@
+cn/edu/xmu/service/model/ServiceProviderDraftTest.class
+cn/edu/xmu/service/controller/ServiceProviderControllerTest.class
+cn/edu/xmu/service/controller/ServiceProviderOrderControllerTest.class
+cn/edu/xmu/service/controller/ServiceOrderInternalControllerTest.class
+cn/edu/xmu/service/model/EnumsTest.class
+cn/edu/xmu/service/ServiceOrderServiceTest.class
+cn/edu/xmu/service/model/ServiceOrderTest.class
+cn/edu/xmu/service/ServiceProviderServiceTest.class
+cn/edu/xmu/service/dao/ServiceOrderRepositoryTest.class
+cn/edu/xmu/service/model/strategy/ServiceOrderStrategyTest.class

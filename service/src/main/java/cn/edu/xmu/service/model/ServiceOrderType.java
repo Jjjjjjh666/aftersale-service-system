@@ -9,8 +9,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ServiceOrderType {
-    ONSITE(0, "上门维修"),
-    MAIL_IN(1, "寄修"),
+    ONSITE_REPAIR(0, "上门维修"),
+    MAIL_IN_REPAIR(1, "寄修"),
     OTHER(2, "其他");
 
     private final Integer code;
@@ -25,4 +25,3 @@ public enum ServiceOrderType {
         throw new IllegalArgumentException("未知的服务类型: " + code);
     }
 }
-

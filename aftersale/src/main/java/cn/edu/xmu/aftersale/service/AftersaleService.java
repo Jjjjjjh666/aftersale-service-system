@@ -2,6 +2,7 @@ package cn.edu.xmu.aftersale.service;
 
 import cn.edu.xmu.aftersale.dao.AftersaleOrderRepository;
 import cn.edu.xmu.aftersale.model.AftersaleOrder;
+import cn.edu.xmu.aftersale.model.AftersaleStatus;
 import cn.edu.xmu.aftersale.model.strategy.AftersaleCancelStrategy;
 import cn.edu.xmu.aftersale.model.strategy.AftersaleConfirmStrategy;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +45,17 @@ public class AftersaleService {
         
         // 4. 执行策略
         strategy.confirm(order, confirm, conclusion);
+
+        // 5. 如果策略未更新状态，兜底处理
+        if (AftersaleStatus.PENDING.equals(order.getStatus())) {
+            if (Boolean.TRUE.equals(confirm)) {
+                order.approve(conclusion);
+            } else {
+                order.reject(conclusion);
+            }
+        }
         
-        // 5. 保存更新
+        // 6. 保存更新
         repository.save(order);
         
         log.info("售后单审核完成: id={}, status={}", id, order.getStatus());
@@ -73,12 +83,16 @@ public class AftersaleService {
         
         // 4. 执行策略
         strategy.cancel(order, reason);
+
+        // 5. 如果策略未更新状态，兜底取消
+        if (!AftersaleStatus.CANCELLED.equals(order.getStatus())) {
+            order.cancel();
+        }
         
-        // 5. 保存更新
+        // 6. 保存更新
         repository.save(order);
         
         log.info("售后单取消完成: id={}, status={}", id, order.getStatus());
         return order.getStatus().getCode();
     }
 }
-

@@ -1,0 +1,14 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Aftersale Module,cn.edu.xmu.aftersale.model.strategy.impl,RepairCancelStrategy,5,40,0,0,1,10,1,2,1,2
+Aftersale Module,cn.edu.xmu.aftersale.model.strategy.impl,ExchangeConfirmStrategy,42,7,6,0,8,2,5,2,2,2
+Aftersale Module,cn.edu.xmu.aftersale.model.strategy.impl,ExchangeCancelStrategy,0,26,0,0,0,7,0,4,0,4
+Aftersale Module,cn.edu.xmu.aftersale.model.strategy.impl,ReturnCancelStrategy,19,7,0,0,5,2,2,2,2,2
+Aftersale Module,cn.edu.xmu.aftersale.model.strategy.impl,ReturnConfirmStrategy,2,47,2,4,0,10,2,5,0,4
+Aftersale Module,cn.edu.xmu.aftersale.model.strategy.impl,RepairConfirmStrategy,2,81,2,4,0,17,2,4,0,3
+Aftersale Module,cn.edu.xmu.aftersale,AftersaleApplication,3,5,0,0,1,2,1,1,1,1
+Aftersale Module,cn.edu.xmu.aftersale.controller,AftersaleController,0,119,0,2,0,18,0,4,0,3
+Aftersale Module,cn.edu.xmu.aftersale.dao,AftersaleOrderRepository,58,4,4,0,15,1,5,1,3,1
+Aftersale Module,cn.edu.xmu.aftersale.service,AftersaleService,14,148,2,4,0,29,4,6,2,5
+Aftersale Module,cn.edu.xmu.aftersale.model,AftersaleType,6,53,1,3,1,7,1,3,0,2
+Aftersale Module,cn.edu.xmu.aftersale.model,AftersaleOrder,22,148,9,9,9,47,9,12,0,10
+Aftersale Module,cn.edu.xmu.aftersale.model,AftersaleStatus,29,35,4,0,4,5,3,1,1,1

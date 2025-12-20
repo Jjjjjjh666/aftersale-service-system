@@ -41,7 +41,6 @@ public class MailInAcceptStrategy implements ServiceOrderAcceptStrategy {
 
     @Override
     public boolean support(Integer type) {
-        return ServiceOrderType.MAIL_IN.getCode().equals(type);
+        return ServiceOrderType.MAIL_IN_REPAIR.getCode().equals(type);
     }
 }
-

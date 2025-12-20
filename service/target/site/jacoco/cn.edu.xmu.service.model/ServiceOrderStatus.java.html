@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceOrderStatus.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.model</a> &gt; <span class="el_source">ServiceOrderStatus.java</span></div><h1>ServiceOrderStatus.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+/**
+ * 服务单状态枚举
+ */
+<span class="fc" id="L9">@Getter</span>
+@AllArgsConstructor
+public enum ServiceOrderStatus {
+<span class="fc" id="L12">    CREATED(&quot;CREATED&quot;, &quot;已创建&quot;),</span>
+<span class="fc" id="L13">    ACCEPTED(&quot;ACCEPTED&quot;, &quot;已接受&quot;),</span>
+<span class="fc" id="L14">    IN_PROGRESS(&quot;IN_PROGRESS&quot;, &quot;进行中&quot;),</span>
+<span class="fc" id="L15">    COMPLETED(&quot;COMPLETED&quot;, &quot;已完成&quot;),</span>
+<span class="fc" id="L16">    CANCELLED(&quot;CANCELLED&quot;, &quot;已取消&quot;);</span>
+
+    private final String code;
+    private final String description;
+
+    public static ServiceOrderStatus of(String code) {
+<span class="fc bfc" id="L22" title="All 2 branches covered.">        for (ServiceOrderStatus status : values()) {</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">            if (status.getCode().equals(code)) {</span>
+<span class="fc" id="L24">                return status;</span>
+            }
+        }
+<span class="fc" id="L27">        throw new IllegalArgumentException(&quot;未知的服务单状态: &quot; + code);</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

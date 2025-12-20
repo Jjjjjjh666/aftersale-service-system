@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RepairCancelStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Aftersale Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.aftersale.model.strategy.impl</a> &gt; <span class="el_source">RepairCancelStrategy.java</span></div><h1>RepairCancelStrategy.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.aftersale.model.strategy.impl;
+
+import cn.edu.xmu.aftersale.client.ServiceClient;
+import cn.edu.xmu.aftersale.model.AftersaleOrder;
+import cn.edu.xmu.aftersale.model.AftersaleType;
+import cn.edu.xmu.aftersale.model.strategy.AftersaleCancelStrategy;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+/**
+ * 维修取消策略
+ * 取消维修需要同时取消对应的服务单
+ */
+<span class="fc" id="L15">@Slf4j</span>
+@Component
+@RequiredArgsConstructor
+public class RepairCancelStrategy implements AftersaleCancelStrategy {
+
+    private final ServiceClient serviceClient;
+
+    @Override
+    public void cancel(AftersaleOrder order, String reason) {
+<span class="fc" id="L24">        log.info(&quot;执行维修取消策略: orderId={}, reason={}&quot;, order.getId(), reason);</span>
+        
+        // 先取消服务单
+        try {
+<span class="fc" id="L28">            serviceClient.cancelServiceOrder(order.getShopId(), order.getId(), reason);</span>
+<span class="fc" id="L29">            log.info(&quot;维修服务单已取消: aftersaleId={}&quot;, order.getId());</span>
+<span class="fc" id="L30">        } catch (Exception e) {</span>
+<span class="fc" id="L31">            log.warn(&quot;取消维修服务单失败: aftersaleId={}&quot;, order.getId(), e);</span>
+            // 这里可以根据业务需求决定是否继续取消售后单
+<span class="fc" id="L33">        }</span>
+        
+        // 再取消售后单
+<span class="fc" id="L36">        order.cancel();</span>
+<span class="fc" id="L37">        log.info(&quot;维修售后单已取消: orderId={}&quot;, order.getId());</span>
+<span class="fc" id="L38">    }</span>
+
+    @Override
+    public boolean support(Integer type) {
+<span class="nc" id="L42">        return AftersaleType.REPAIR.getCode().equals(type);</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
