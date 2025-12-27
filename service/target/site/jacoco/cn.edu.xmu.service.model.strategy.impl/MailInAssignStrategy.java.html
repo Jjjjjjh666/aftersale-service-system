@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MailInAssignStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.model.strategy.impl</a> &gt; <span class="el_source">MailInAssignStrategy.java</span></div><h1>MailInAssignStrategy.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.model.strategy.impl;
+
+import cn.edu.xmu.javaee.core.model.InternalReturnObject;
+import cn.edu.xmu.service.client.LogisticsClient;
+import cn.edu.xmu.service.client.dto.CreatePackageRequest;
+import cn.edu.xmu.service.client.dto.CreatePackageResponse;
+import cn.edu.xmu.service.model.ServiceOrder;
+import cn.edu.xmu.service.model.ServiceOrderType;
+import cn.edu.xmu.service.model.strategy.ServiceOrderAssignStrategy;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 寄修派工策略
+ * 寄修派工时需要生成运单，通知客户寄送商品
+ */
+<span class="fc" id="L21">@Slf4j</span>
+@Component
+@RequiredArgsConstructor
+public class MailInAssignStrategy implements ServiceOrderAssignStrategy {
+
+    private final LogisticsClient logisticsClient;
+
+    @Override
+    public void assign(ServiceOrder order, Long serviceStaffId) {
+<span class="fc" id="L30">        log.info(&quot;执行寄修派工策略: orderId={}, serviceStaffId={}&quot;, order.getId(), serviceStaffId);</span>
+        
+        // 1. 分配维修师傅
+<span class="fc" id="L33">        order.assign(serviceStaffId);</span>
+        
+        // 2. 生成运单（客户寄送商品到维修点）
+        try {
+<span class="fc" id="L37">            Long expressId = createPackageForMailIn(order);</span>
+<span class="fc" id="L38">            order.setExpressId(expressId);</span>
+<span class="fc" id="L39">            log.info(&quot;寄修运单创建成功: orderId={}, expressId={}&quot;, order.getId(), expressId);</span>
+<span class="fc" id="L40">        } catch (Exception e) {</span>
+<span class="fc" id="L41">            log.error(&quot;创建寄修运单失败: orderId={}&quot;, order.getId(), e);</span>
+<span class="fc" id="L42">            throw new RuntimeException(&quot;创建寄修运单失败: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L43">        }</span>
+        
+<span class="fc" id="L45">        log.info(&quot;寄修派工完成: orderId={}, serviceStaffId={}, expressId={}&quot;, </span>
+<span class="fc" id="L46">                 order.getId(), serviceStaffId, order.getExpressId());</span>
+<span class="fc" id="L47">    }</span>
+
+    @Override
+    public boolean support(Integer type) {
+<span class="fc" id="L51">        return ServiceOrderType.MAIL_IN_REPAIR.getCode().equals(type);</span>
+    }
+    
+    /**
+     * 创建寄修运单
+     * 客户寄送商品到维修点
+     */
+    private Long createPackageForMailIn(ServiceOrder order) {
+        // 构建发件地址（客户地址 - 从服务单获取）
+        CreatePackageRequest.AddressInfo address = 
+<span class="fc" id="L61">            CreatePackageRequest.AddressInfo.builder()</span>
+<span class="fc" id="L62">                .name(order.getConsignee())      // 客户姓名</span>
+<span class="fc" id="L63">                .mobile(order.getMobile())       // 客户电话</span>
+<span class="fc" id="L64">                .regionId(order.getRegionId())   // 客户地区</span>
+<span class="fc" id="L65">                .address(order.getAddress())     // 客户详细地址</span>
+<span class="fc" id="L66">                .build();</span>
+        
+        // 构建托寄物信息
+        CreatePackageRequest.CargoDetail cargo = 
+<span class="fc" id="L70">            CreatePackageRequest.CargoDetail.builder()</span>
+<span class="fc" id="L71">                .id(order.getProductId())</span>
+<span class="fc" id="L72">                .name(&quot;待维修产品&quot;)</span>
+<span class="fc" id="L73">                .count(1)</span>
+<span class="fc" id="L74">                .unit(&quot;件&quot;)</span>
+<span class="fc" id="L75">                .weight(1000)  // 1kg，应该从产品信息获取</span>
+<span class="fc" id="L76">                .amount(0)     // 无价值申报</span>
+<span class="fc" id="L77">                .build();</span>
+        
+<span class="fc" id="L79">        List&lt;CreatePackageRequest.CargoDetail&gt; cargoList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L80">        cargoList.add(cargo);</span>
+        
+        // 构建完整请求
+<span class="fc" id="L83">        CreatePackageRequest request = CreatePackageRequest.builder()</span>
+<span class="fc" id="L84">                .contractId(0L)          // 0表示自动选择物流合同</span>
+<span class="fc" id="L85">                .payMethod(2)            // 2-收方付（服务商承担运费）</span>
+<span class="fc" id="L86">                .address(address)</span>
+<span class="fc" id="L87">                .cargoDetails(cargoList)</span>
+<span class="fc" id="L88">                .build();</span>
+        
+        // 调用物流API
+<span class="fc" id="L91">        InternalReturnObject&lt;CreatePackageResponse&gt; response = </span>
+<span class="fc" id="L92">            logisticsClient.createPackage(</span>
+<span class="fc" id="L93">                1L,  // shopId，实际应该从服务单获取</span>
+                &quot;Bearer token&quot;,  // 实际应该从上下文获取
+                request
+            );
+        
+<span class="fc" id="L98">        CreatePackageResponse packageData = response.getData();</span>
+<span class="fc" id="L99">        log.info(&quot;物流运单创建成功: packageId={}, billCode={}&quot;, </span>
+<span class="fc" id="L100">                 packageData.getId(), packageData.getBillCode());</span>
+        
+<span class="fc" id="L102">        return packageData.getId();</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

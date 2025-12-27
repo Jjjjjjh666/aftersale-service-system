@@ -1,0 +1,40 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+core,cn.edu.xmu.javaee.core.model,ReturnNoBaK,624,0,2,0,88,0,8,0,7,0
+core,cn.edu.xmu.javaee.core.model,ReturnObject,78,0,0,0,26,0,11,0,11,0
+core,cn.edu.xmu.javaee.core.model,Constants,27,0,0,0,7,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.model,BloomFilter,8,0,0,0,2,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.model,OOMallObject,45,0,0,0,16,0,4,0,4,0
+core,cn.edu.xmu.javaee.core.model,BloomFilter.new HashMap() {...},18,0,0,0,5,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.model,InternalReturnObject,79,0,0,0,22,0,10,0,10,0
+core,cn.edu.xmu.javaee.core.model,UserToken,15,0,0,0,6,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.model,ReturnNo,650,0,2,0,91,0,9,0,8,0
+core,cn.edu.xmu.javaee.core.mapper,RedisUtil.new RedisCallback() {...},39,0,0,0,7,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.mapper,RedisUtil.new RedisCallback() {...},39,0,0,0,7,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.mapper,RedisUtil.new RedisCallback() {...},39,0,0,0,7,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.mapper,RedisUtil,453,0,18,0,68,0,50,0,41,0
+core,cn.edu.xmu.javaee.core.model.returnval,TwoTuple,9,0,0,0,4,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.model.returnval,ThreeTuple,12,0,0,0,5,0,1,0,1,0
+core,cn.edu.xmu.javaee.core,CoreApplication,8,0,0,0,3,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.config,OpenFeignConfig,7,0,0,0,2,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.config,RedisConfig,61,0,0,0,16,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.config,LoadBalanceConfig,7,0,0,0,2,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.config,CorsConfig,51,0,0,0,7,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.config,OpenFeignHeaderInterceptor,126,0,16,0,33,0,12,0,4,0
+core,cn.edu.xmu.javaee.core.aop,AuditAspect,37,0,0,0,13,0,3,0,3,0
+core,cn.edu.xmu.javaee.core.aop,ControllerAspect,287,0,44,0,61,0,25,0,3,0
+core,cn.edu.xmu.javaee.core.aop,OpenFeignMapperAspect,105,0,10,0,25,0,8,0,3,0
+core,cn.edu.xmu.javaee.core.aop,DaoAspect,59,0,0,0,14,0,2,0,2,0
+core,cn.edu.xmu.javaee.core.aop,CommonPointCuts,7,0,0,0,5,0,5,0,5,0
+core,cn.edu.xmu.javaee.core.aop,ControllerAdvice,107,0,6,0,20,0,7,0,4,0
+core,cn.edu.xmu.javaee.core.util,JacksonUtil,716,0,36,0,182,0,38,0,20,0
+core,cn.edu.xmu.javaee.core.util,Common,365,0,10,0,39,0,10,0,5,0
+core,cn.edu.xmu.javaee.core.util,SnowFlakeIdWorker,251,0,16,0,39,0,13,0,5,0
+core,cn.edu.xmu.javaee.core.util,JacksonUtil.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.util,JacksonUtil.new HashSet() {...},28,0,0,0,7,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.util,JacksonUtil.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.util,JacksonUtil.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.util,JacksonUtil.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.util,JacksonUtil.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.util,JacksonUtil.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+core,cn.edu.xmu.javaee.core.util,JwtHelper,236,0,18,0,63,0,13,0,4,0
+core,cn.edu.xmu.javaee.core.exception,BusinessException,18,0,0,0,7,0,3,0,3,0

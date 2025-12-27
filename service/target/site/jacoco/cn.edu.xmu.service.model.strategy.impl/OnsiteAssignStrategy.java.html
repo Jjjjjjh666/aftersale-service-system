@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OnsiteAssignStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.model.strategy.impl</a> &gt; <span class="el_source">OnsiteAssignStrategy.java</span></div><h1>OnsiteAssignStrategy.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.model.strategy.impl;
+
+import cn.edu.xmu.service.model.ServiceOrder;
+import cn.edu.xmu.service.model.ServiceOrderType;
+import cn.edu.xmu.service.model.strategy.ServiceOrderAssignStrategy;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+/**
+ * 上门维修派工策略
+ * 上门维修派工时只需要分配师傅即可
+ */
+<span class="fc" id="L13">@Slf4j</span>
+@Component
+<span class="fc" id="L15">public class OnsiteAssignStrategy implements ServiceOrderAssignStrategy {</span>
+
+    @Override
+    public void assign(ServiceOrder order, Long serviceStaffId) {
+<span class="fc" id="L19">        log.info(&quot;执行上门维修派工策略: orderId={}, serviceStaffId={}&quot;, order.getId(), serviceStaffId);</span>
+        
+        // 上门维修：只需要分配师傅
+<span class="fc" id="L22">        order.assign(serviceStaffId);</span>
+        
+<span class="fc" id="L24">        log.info(&quot;上门维修派工完成: orderId={}, serviceStaffId={}&quot;, order.getId(), serviceStaffId);</span>
+<span class="fc" id="L25">    }</span>
+
+    @Override
+    public boolean support(Integer type) {
+<span class="fc" id="L29">        return ServiceOrderType.ONSITE_REPAIR.getCode().equals(type);</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

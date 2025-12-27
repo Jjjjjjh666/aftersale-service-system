@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.model</a> &gt; <span class="el_source">ServiceProvider.java</span></div><h1>ServiceProvider.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.model;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.service.dao.po.ServiceProviderPo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+/**
+ * 服务商领域对象
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ServiceProvider {
+
+    private Long id;
+    private String name; // 服务商名称
+    private String consignee; // 联系人
+    private String address; // 地址
+    private String mobile; // 电话
+    private String status; // 状态：ACTIVE-活跃 INACTIVE-不活跃
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    /**
+     * 从PO构建领域对象
+     */
+    public static ServiceProvider fromPo(ServiceProviderPo po) {
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">        if (po == null) {</span>
+<span class="nc" id="L36">            return null;</span>
+        }
+<span class="fc" id="L38">        return ServiceProvider.builder()</span>
+<span class="fc" id="L39">                .id(po.getId())</span>
+<span class="fc" id="L40">                .name(po.getName())</span>
+<span class="fc" id="L41">                .consignee(po.getConsignee())</span>
+<span class="fc" id="L42">                .address(po.getAddress())</span>
+<span class="fc" id="L43">                .mobile(po.getMobile())</span>
+<span class="fc" id="L44">                .status(po.getStatus())</span>
+<span class="fc" id="L45">                .createdAt(po.getCreatedAt())</span>
+<span class="fc" id="L46">                .updatedAt(po.getUpdatedAt())</span>
+<span class="fc" id="L47">                .build();</span>
+    }
+
+    /**
+     * 转换为PO
+     */
+    public ServiceProviderPo toPo() {
+<span class="fc" id="L54">        ServiceProviderPo po = new ServiceProviderPo();</span>
+<span class="fc" id="L55">        po.setId(this.id);</span>
+<span class="fc" id="L56">        po.setName(this.name);</span>
+<span class="fc" id="L57">        po.setConsignee(this.consignee);</span>
+<span class="fc" id="L58">        po.setAddress(this.address);</span>
+<span class="fc" id="L59">        po.setMobile(this.mobile);</span>
+<span class="fc" id="L60">        po.setStatus(this.status);</span>
+<span class="fc" id="L61">        po.setCreatedAt(this.createdAt);</span>
+<span class="fc" id="L62">        po.setUpdatedAt(this.updatedAt);</span>
+<span class="fc" id="L63">        return po;</span>
+    }
+
+    /**
+     * 更新服务商信息
+     */
+    public void updateInfo(String name, String consignee, String address, String mobile) {
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (name != null) {</span>
+<span class="fc" id="L71">            this.name = name;</span>
+        }
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (consignee != null) {</span>
+<span class="fc" id="L74">            this.consignee = consignee;</span>
+        }
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (address != null) {</span>
+<span class="fc" id="L77">            this.address = address;</span>
+        }
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if (mobile != null) {</span>
+<span class="fc" id="L80">            this.mobile = mobile;</span>
+        }
+<span class="fc" id="L82">        this.updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L83">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

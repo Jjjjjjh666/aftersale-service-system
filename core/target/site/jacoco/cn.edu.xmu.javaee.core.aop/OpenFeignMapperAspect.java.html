@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OpenFeignMapperAspect.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.javaee.core.aop</a> &gt; <span class="el_source">OpenFeignMapperAspect.java</span></div><h1>OpenFeignMapperAspect.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.javaee.core.aop;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.InternalReturnObject;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.util.JacksonUtil;
+import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+
+import java.util.Objects;
+
+@Aspect
+@Component
+<span class="nc" id="L18">@Slf4j</span>
+<span class="nc" id="L19">public class OpenFeignMapperAspect {</span>
+
+    @Around(&quot;cn.edu.xmu.javaee.core.aop.CommonPointCuts.openFeignMapperMethods()&quot;)
+    public Object handleFeignMapperReturn(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object result;
+
+        try {
+            // 执行目标方法（即 Feign 调用）
+<span class="nc" id="L27">            result = joinPoint.proceed();</span>
+
+            // Feign 请求成功返回（状态码200或201）
+<span class="nc bnc" id="L30" title="All 2 branches missed.">            if (Objects.nonNull(result)) {</span>
+                // 如果返回的是 InternalReturnObject 类型，直接获取 errno
+<span class="nc bnc" id="L32" title="All 2 branches missed.">                if (result instanceof InternalReturnObject&lt;?&gt; internalReturnObject) {</span>
+
+                    // 如果 errno 不为 0，抛出 BusinessException
+<span class="nc bnc" id="L35" title="All 2 branches missed.">                    if (internalReturnObject.getErrno() != ReturnNo.OK.getErrNo()) {</span>
+<span class="nc" id="L36">                        String errmsg = internalReturnObject.getErrmsg();</span>
+<span class="nc" id="L37">                        log.error(&quot;HTTP code is 200/201 but InternalReturnObject error: errno={}, errmsg={}&quot;, internalReturnObject.getErrno(), errmsg);</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">                        throw new BusinessException(ReturnNo.getReturnNoByCode(internalReturnObject.getErrno()), errmsg != null ? errmsg : &quot;未知错误&quot;);</span>
+                    }
+                } else {
+                    // 如果不是 InternalReturnObject 类型，可以按需处理
+<span class="nc" id="L42">                    log.warn(&quot;Unexpected response type: {}&quot;, result.getClass().getName());</span>
+                }
+            }
+<span class="nc" id="L45">        } catch (FeignException e) {</span>
+            // 捕获 FeignException
+<span class="nc" id="L47">            log.error(&quot;FeignException occurred: {}&quot;, e.getMessage());</span>
+
+            // 解析 FeignException 的响应体，提取 errno 和 errmsg
+<span class="nc" id="L50">            String responseBody = e.contentUTF8();  // 获取响应体的内容</span>
+<span class="nc" id="L51">            log.debug(&quot;FeignException response body: {}&quot;, responseBody);</span>
+
+            // 解析 JSON 内容
+            // 这里假设返回的 JSON 是类似 {&quot;errno&quot;:4, &quot;errmsg&quot;:&quot;运费模板对象(id=9999)不存在&quot;} 格式
+            // 使用 JacksonUtil 解析 JSON 响应体中的 errno 和 errmsg
+<span class="nc" id="L56">            Integer errno = JacksonUtil.parseInteger(responseBody, &quot;errno&quot;);</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">            if (Objects.isNull(errno)) {</span>
+<span class="nc" id="L58">                log.error(&quot;Error: errno is null in FeignException response&quot;);</span>
+<span class="nc" id="L59">                throw new BusinessException(ReturnNo.INTERNAL_SERVER_ERR, &quot;服务器错误&quot;);</span>
+            }
+
+<span class="nc" id="L62">            String errmsg = JacksonUtil.parseString(responseBody, &quot;errmsg&quot;);</span>
+            // 根据 errno 判断并抛出对应的 BusinessException
+<span class="nc" id="L64">            throw new BusinessException(ReturnNo.getReturnNoByCode(errno), errmsg);</span>
+
+<span class="nc" id="L66">        } catch (Exception e) {</span>
+            // 捕获其他未预期的异常
+<span class="nc" id="L68">            log.error(&quot;Unexpected exception occurred: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L69">            throw e;  // 可以根据需要重新抛出或封装为自定义异常</span>
+<span class="nc" id="L70">        }</span>
+
+<span class="nc" id="L72">        return result;  // 返回结果</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

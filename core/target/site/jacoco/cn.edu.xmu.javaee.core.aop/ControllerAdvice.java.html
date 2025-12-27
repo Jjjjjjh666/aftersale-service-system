@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControllerAdvice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.javaee.core.aop</a> &gt; <span class="el_source">ControllerAdvice.java</span></div><h1>ControllerAdvice.java</h1><pre class="source lang-java linenums">//School of Informatics Xiamen University, GPL-3.0 license
+package cn.edu.xmu.javaee.core.aop;
+
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.ReturnObject;
+import jakarta.validation.ValidationException;
+import jdk.jfr.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
+
+/**
+ * 处理RestController的validation Exception
+ */
+@RestControllerAdvice
+<span class="nc" id="L26">public class ControllerAdvice {</span>
+
+<span class="nc" id="L28">    private final Logger logger = LoggerFactory.getLogger(ControllerAdvice.class);</span>
+
+    /**
+     * 需要配置
+     * server.servlet.encoding.charset=UTF-8
+     * server.servlet.encoding.enabled=true
+     * server.servlet.encoding.force=true
+     * 否则中文返回是乱码
+     * @param e
+     * @return
+     */
+    @ExceptionHandler({BindException.class, ValidationException.class, MethodArgumentNotValidException.class})
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public ReturnObject bindExceptionHandler(Exception e){
+<span class="nc" id="L42">        StringBuilder sb = new StringBuilder();</span>
+
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (e instanceof BindException) {</span>
+<span class="nc" id="L45">            List&lt;FieldError&gt; allErrors = ((BindException) e).getFieldErrors();</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">            for (FieldError error : allErrors) {</span>
+<span class="nc" id="L47">                sb.append(String.format(&quot;%s:%s,&quot;, error.getField(), error.getDefaultMessage()));</span>
+<span class="nc" id="L48">            }</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        }else if (e instanceof  MethodArgumentNotValidException){</span>
+<span class="nc" id="L50">            BindingResult bindingResult = ((MethodArgumentNotValidException) e).getBindingResult();</span>
+<span class="nc" id="L51">            FieldError error = bindingResult.getFieldError();</span>
+<span class="nc" id="L52">            sb.append(error.getDefaultMessage());</span>
+<span class="nc" id="L53">        }else{</span>
+<span class="nc" id="L54">            sb.append(e.getMessage());</span>
+        }
+<span class="nc" id="L56">        logger.debug(&quot;bindExceptionHandler: e = {}&quot;,sb.toString());</span>
+<span class="nc" id="L57">        return new ReturnObject(ReturnNo.FIELD_NOTVALID, sb.toString());</span>
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = NumberFormatException.class)
+    public ReturnObject numberFormatException(NumberFormatException exception) {
+<span class="nc" id="L63">        logger.debug(&quot;numberFormatNotValid: msg = {}&quot;, exception.getMessage());</span>
+<span class="nc" id="L64">        return new ReturnObject(ReturnNo.FIELD_NOTVALID, exception.getMessage());</span>
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public ReturnObject httpMessageNotReadableException(HttpMessageNotReadableException exception) {
+<span class="nc" id="L70">        logger.debug(&quot;httpMessageNotReadableException: msg = {}&quot;, exception.getMessage());</span>
+<span class="nc" id="L71">        return new ReturnObject(ReturnNo.FIELD_NOTVALID, exception.getMessage());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

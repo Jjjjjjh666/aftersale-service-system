@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Common.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.javaee.core.util</a> &gt; <span class="el_source">Common.java</span></div><h1>Common.java</h1><pre class="source lang-java linenums">//School of Informatics Xiamen University, GPL-3.0 license
+package cn.edu.xmu.javaee.core.util;
+
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.regex.Pattern;
+
+/**
+ * 通用工具类
+ *
+ * @author Ming Qiu
+ **/
+<span class="nc" id="L19">@Slf4j</span>
+<span class="nc" id="L20">public class Common {</span>
+
+    // 将127.0.0.1形式的IP地址转换成十进制整数，这里没有进行任何错误处理
+    public static Long ipToLong(String strIp) {
+<span class="nc" id="L24">        Long[] ip = new Long[4];</span>
+        // 先找到IP地址字符串中.的位置
+<span class="nc" id="L26">        int position1 = strIp.indexOf(&quot;.&quot;);</span>
+<span class="nc" id="L27">        int position2 = strIp.indexOf(&quot;.&quot;, position1 + 1);</span>
+<span class="nc" id="L28">        int position3 = strIp.indexOf(&quot;.&quot;, position2 + 1);</span>
+        // 将每个.之间的字符串转换成整型
+<span class="nc" id="L30">        ip[0] = Long.parseLong(strIp.substring(0, position1));</span>
+<span class="nc" id="L31">        ip[1] = Long.parseLong(strIp.substring(position1 + 1, position2));</span>
+<span class="nc" id="L32">        ip[2] = Long.parseLong(strIp.substring(position2 + 1, position3));</span>
+<span class="nc" id="L33">        ip[3] = Long.parseLong(strIp.substring(position3 + 1));</span>
+<span class="nc" id="L34">        return (ip[0] &lt;&lt; 24) + (ip[1] &lt;&lt; 16) + (ip[2] &lt;&lt; 8) + ip[3];</span>
+    }
+
+    // 将十进制整数形式转换成127.0.0.1形式的ip地址
+    public static String longToIP(Long longIp) {
+<span class="nc" id="L39">        StringBuffer sb = new StringBuffer(&quot;&quot;);</span>
+        // 直接右移24位
+<span class="nc" id="L41">        sb.append(String.valueOf((longIp &gt;&gt;&gt; 24)));</span>
+<span class="nc" id="L42">        sb.append(&quot;.&quot;);</span>
+        // 将高8位置0，然后右移16位
+<span class="nc" id="L44">        sb.append(String.valueOf((longIp &amp; 0x00FFFFFF) &gt;&gt;&gt; 16));</span>
+<span class="nc" id="L45">        sb.append(&quot;.&quot;);</span>
+        // 将高16位置0，然后右移8位
+<span class="nc" id="L47">        sb.append(String.valueOf((longIp &amp; 0x0000FFFF) &gt;&gt;&gt; 8));</span>
+<span class="nc" id="L48">        sb.append(&quot;.&quot;);</span>
+        // 将高24位置0
+<span class="nc" id="L50">        sb.append(String.valueOf((longIp &amp; 0x000000FF)));</span>
+<span class="nc" id="L51">        return sb.toString();</span>
+    }
+
+    /**
+     * 生成九位数序号
+     * 要保证同一服务的不同实例生成出的序号是不同的
+     * @param  platform 机器号 如果一个服务有多个实例，机器号需不同，目前从1至36
+     * @return 序号
+     */
+    public static String genSeqNum(int platform) {
+<span class="nc" id="L61">        int maxNum = 36;</span>
+        int i;
+
+<span class="nc" id="L64">        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(&quot;yyyyMMddHHmmssS&quot;);</span>
+<span class="nc" id="L65">        LocalDateTime localDateTime = LocalDateTime.now();</span>
+<span class="nc" id="L66">        String strDate = localDateTime.format(dtf);</span>
+<span class="nc" id="L67">        StringBuffer sb = new StringBuffer(strDate);</span>
+
+<span class="nc" id="L69">        int count = 0;</span>
+<span class="nc" id="L70">        char[] str = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',</span>
+                'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+                'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+<span class="nc" id="L74">        SecureRandom r = new SecureRandom();</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        while (count &lt; 2) {</span>
+<span class="nc" id="L76">            i = Math.abs(r.nextInt(maxNum));</span>
+<span class="nc bnc" id="L77" title="All 4 branches missed.">            if (i &gt;= 0 &amp;&amp; i &lt; str.length) {</span>
+<span class="nc" id="L78">                sb.append(str[i]);</span>
+<span class="nc" id="L79">                count++;</span>
+            }
+        }
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (platform &gt; 36){</span>
+<span class="nc" id="L83">            platform = 36;</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        } else if (platform &lt; 1){</span>
+<span class="nc" id="L85">            platform = 1;</span>
+        }
+
+<span class="nc" id="L88">        sb.append(str[platform-1]);</span>
+<span class="nc" id="L89">        return sb.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

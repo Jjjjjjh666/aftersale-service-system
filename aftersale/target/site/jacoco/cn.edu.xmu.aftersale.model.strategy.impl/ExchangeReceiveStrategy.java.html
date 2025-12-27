@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExchangeReceiveStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Aftersale Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.aftersale.model.strategy.impl</a> &gt; <span class="el_source">ExchangeReceiveStrategy.java</span></div><h1>ExchangeReceiveStrategy.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.aftersale.model.strategy.impl;
+
+import cn.edu.xmu.aftersale.client.LogisticsClient;
+import cn.edu.xmu.aftersale.client.dto.CreatePackageRequest;
+import cn.edu.xmu.aftersale.client.dto.CreatePackageResponse;
+import cn.edu.xmu.aftersale.model.AftersaleOrder;
+import cn.edu.xmu.aftersale.model.AftersaleType;
+import cn.edu.xmu.aftersale.model.strategy.AftersaleProcessStrategy;
+import cn.edu.xmu.javaee.core.model.InternalReturnObject;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+/**
+ * 已验收换货的处理策略：发出替换商品并完成
+ */
+<span class="fc" id="L19">@Slf4j</span>
+@Component
+@RequiredArgsConstructor
+public class ExchangeReceiveStrategy implements AftersaleProcessStrategy {
+
+    private final LogisticsClient logisticsClient;
+
+    @Override
+    public void process(AftersaleOrder order, String conclusion) {
+<span class="fc" id="L28">        log.info(&quot;处理已验收换货: orderId={}&quot;, order.getId());</span>
+<span class="fc" id="L29">        Long expressId = createOutboundPackage(order);</span>
+<span class="fc" id="L30">        order.setReturnExpressId(expressId);</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">        order.complete(conclusion != null ? conclusion : &quot;换货已验收，发货完成&quot;);</span>
+<span class="fc" id="L32">        log.info(&quot;换货处理完成: orderId={}, outboundExpressId={}&quot;, order.getId(), expressId);</span>
+<span class="fc" id="L33">    }</span>
+
+    @Override
+    public boolean support(Integer type) {
+<span class="fc" id="L37">        return AftersaleType.EXCHANGE.getCode().equals(type);</span>
+    }
+
+    /** 创建换货发货运单（商家发货给顾客） */
+    private Long createOutboundPackage(AftersaleOrder order) {
+<span class="fc" id="L42">        CreatePackageRequest.AddressInfo address = CreatePackageRequest.AddressInfo.builder()</span>
+<span class="fc" id="L43">                .name(&quot;商家仓库&quot;)</span>
+<span class="fc" id="L44">                .mobile(&quot;400-888-8888&quot;)</span>
+<span class="fc" id="L45">                .regionId(100000L)</span>
+<span class="fc" id="L46">                .address(&quot;商家仓库地址&quot;)</span>
+<span class="fc" id="L47">                .build();</span>
+
+<span class="fc" id="L49">        CreatePackageRequest.CargoDetail cargo = CreatePackageRequest.CargoDetail.builder()</span>
+<span class="fc" id="L50">                .id(order.getProductId())</span>
+<span class="fc" id="L51">                .name(&quot;换货商品&quot;)</span>
+<span class="fc" id="L52">                .count(1)</span>
+<span class="fc" id="L53">                .unit(&quot;件&quot;)</span>
+<span class="fc" id="L54">                .weight(1000)</span>
+<span class="fc" id="L55">                .amount(0)</span>
+<span class="fc" id="L56">                .build();</span>
+
+<span class="fc" id="L58">        CreatePackageRequest request = CreatePackageRequest.builder()</span>
+<span class="fc" id="L59">                .contractId(0L)</span>
+<span class="fc" id="L60">                .payMethod(2) // 收方付</span>
+<span class="fc" id="L61">                .address(address)</span>
+<span class="fc" id="L62">                .cargoDetails(List.of(cargo))</span>
+<span class="fc" id="L63">                .build();</span>
+
+<span class="fc" id="L65">        InternalReturnObject&lt;CreatePackageResponse&gt; response =</span>
+<span class="fc" id="L66">                logisticsClient.createPackage(order.getShopId(), &quot;Bearer token&quot;, request);</span>
+<span class="fc" id="L67">        return response.getData().getId();</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

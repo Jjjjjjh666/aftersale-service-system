@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedisConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.javaee.core.config</a> &gt; <span class="el_source">RedisConfig.java</span></div><h1>RedisConfig.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.javaee.core.config;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.io.Serializable;
+
+@Configuration
+<span class="nc" id="L20">public class RedisConfig {</span>
+    @Bean
+    public RedisTemplate&lt;String, Serializable&gt; redisTemplate(LettuceConnectionFactory factory) {
+<span class="nc" id="L23">        RedisTemplate&lt;String, Serializable&gt; template = new RedisTemplate&lt;&gt;();</span>
+<span class="nc" id="L24">        template.setConnectionFactory(factory);</span>
+
+        //使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
+<span class="nc" id="L27">        ObjectMapper om = new ObjectMapper();</span>
+<span class="nc" id="L28">        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);</span>
+
+        // 解决jackson2无法反序列化LocalDateTime的问题
+<span class="nc" id="L31">        om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);</span>
+<span class="nc" id="L32">        om.registerModule(new JavaTimeModule());</span>
+
+        //指定序列化输入的类型，就是将数据库里的数据按照一定类型存储到redis缓存中。
+        //整个类、除final外的的属性信息都需要被序列化和反序列化。
+<span class="nc" id="L36">        om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);</span>
+<span class="nc" id="L37">        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer&lt;&gt;(om, Object.class);</span>
+
+<span class="nc" id="L39">        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();</span>
+
+        // 在使用注解@Bean返回RedisTemplate的时候，同时配置hashKey与hashValue的序列化方式。
+        // key采用String的序列化方式
+<span class="nc" id="L43">        template.setKeySerializer(stringRedisSerializer);</span>
+        // value序列化方式采用jackson
+<span class="nc" id="L45">        template.setValueSerializer(jackson2JsonRedisSerializer);</span>
+
+        // hash的key也采用String的序列化方式
+<span class="nc" id="L48">        template.setHashKeySerializer(stringRedisSerializer);</span>
+        // hash的value序列化方式采用jackson
+<span class="nc" id="L50">        template.setHashValueSerializer(jackson2JsonRedisSerializer);</span>
+
+<span class="nc" id="L52">        template.afterPropertiesSet();</span>
+<span class="nc" id="L53">        return template;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

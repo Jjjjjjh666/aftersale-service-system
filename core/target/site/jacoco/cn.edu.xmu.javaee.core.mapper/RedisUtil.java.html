@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedisUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.javaee.core.mapper</a> &gt; <span class="el_source">RedisUtil.java</span></div><h1>RedisUtil.java</h1><pre class="source lang-java linenums">//School of Informatics Xiamen University, GPL-3.0 license
+package cn.edu.xmu.javaee.core.mapper;
+
+import io.lettuce.core.*;
+import io.lettuce.core.api.StatefulConnection;
+import io.lettuce.core.dynamic.RedisCommandFactory;
+import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisStringCommands.BitOperation;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+
+/**
+ * Redis工具类
+ * @author Ming Qiu
+ * @modify huang zhong
+ * @modifydate 2023
+ **/
+@Component
+@RequiredArgsConstructor
+public class RedisUtil {
+
+    @Resource
+    private final RedisTemplate&lt;String, Serializable&gt; redisTemplate;
+
+    /**
+     * 删除缓存
+     *
+     * @param key 可以传一个值 或多个
+     */
+    public void del(String... key) {
+<span class="nc bnc" id="L46" title="All 4 branches missed.">        if (key != null &amp;&amp; key.length &gt; 0) {</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">            if (key.length == 1) {</span>
+<span class="nc" id="L48">                redisTemplate.delete(key[0]);</span>
+            }else{
+<span class="nc" id="L50">                redisTemplate.delete((Collection&lt;String&gt;) CollectionUtils.arrayToList(key));</span>
+            }
+        }
+<span class="nc" id="L53">    }</span>
+
+    /**
+     * 普通缓存获取
+     *
+     * @param key 键
+     * @return 值
+     */
+    public Serializable get(String key) {
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        return key == null ? null : redisTemplate.opsForValue().get(key);</span>
+    }
+
+    /**
+     * 普通缓存放入
+     *
+     * @param key   键
+     * @param value 值
+     * @param timeout 过期时间， -1为永不过期
+     * @return true成功 false失败
+     */
+    public  boolean set(String key, Serializable value, long timeout) throws RuntimeException{
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (timeout &gt; 0) {</span>
+            // 为了防止雪崩，随机生成过期时间，范围为 timeout ~ timeout + timeout / 5
+<span class="nc" id="L76">            timeout = randomizeTimeout(timeout);</span>
+<span class="nc" id="L77">            redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);</span>
+        }else{
+<span class="nc" id="L79">            redisTemplate.opsForValue().set(key, value);</span>
+        }
+<span class="nc" id="L81">        return true;</span>
+    }
+
+    /**
+     * 递减
+     * @param key   键
+     * @param delta 要减少几(小于0)
+     * @return
+     */
+    public long decr(String key, long delta) {
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (delta &gt; 0) {</span>
+<span class="nc" id="L92">            return redisTemplate.opsForValue().increment(key, -delta);</span>
+        }else {
+<span class="nc" id="L94">            return 0;</span>
+        }
+    }
+
+    /**
+     * 判断redis中是否存在键值
+     * @param key   键
+     * @return
+     */
+    public boolean hasKey(String key) {
+<span class="nc" id="L104">        return redisTemplate.hasKey(key);</span>
+    }
+
+    /**
+     * 设置key的过期时间
+     * @param key
+     * @param timeout
+     * @param unit
+     * @return
+     */
+    public Boolean expire(String key, long timeout, TimeUnit unit){
+<span class="nc" id="L115">        return redisTemplate.expire(key,timeout,unit);</span>
+    }
+
+    /**
+     * 获得redis中set集合
+     * @param key   键
+     * @return
+     */
+    public Set&lt;Serializable &gt; getSet(String key) {
+<span class="nc" id="L124">        return  redisTemplate.opsForSet().members(key);</span>
+    }
+
+    /**
+     * 将Redis中key对应的值和集合otherKeys中的所有键对应的值并在destKey所对应的集合中
+     * @param key
+     * @param otherKeys
+     * @param destKey
+     * @return
+     */
+    public Long unionAndStoreSet(String key, Collection&lt;String&gt; otherKeys, String destKey){
+<span class="nc" id="L135">        return redisTemplate.opsForSet().unionAndStore(key, otherKeys, destKey);</span>
+    }
+
+    /**
+     * 将keys的值并起来存在destKey中
+     * @param keys
+     * @param destKey
+     * @return
+     */
+    public Long unionAndStoreSet(Collection&lt;String&gt; keys, String destKey){
+<span class="nc" id="L145">        return redisTemplate.opsForSet().unionAndStore(keys, destKey);</span>
+    }
+    /**
+     * 将values加入key的集合中
+     * @param key
+     * @param values
+     * @return
+     */
+    public Long addSet(String key, Serializable... values) {
+<span class="nc" id="L154">        return redisTemplate.opsForSet().add(key, values);</span>
+    }
+
+    /**
+     * 判断value是否是key的集合中的一元
+     * @param key
+     * @param value
+     * @return
+     */
+    public Boolean isMemberSet(String key, Serializable value) {
+<span class="nc" id="L164">        return redisTemplate.opsForSet().isMember(key, value);</span>
+    }
+    /**
+     * 获取List中第index元素
+     * @param key
+     * @param index
+     * @return
+     */
+    public Serializable indexList(String key, long index) {
+<span class="nc" id="L173">        return redisTemplate.opsForList().index(key, index);</span>
+    }
+
+    /**
+     * 获取list中start至end的元素
+     * @param key
+     * @param start
+     * @param end
+     * @return
+     */
+    public List&lt;Serializable&gt; rangeList(String key, long start, long end){
+<span class="nc" id="L184">        return redisTemplate.opsForList().range(key, start,end);</span>
+    }
+
+    /**
+     * 从队列中移除value对象
+     * @param key redis的key
+     * @param count 前多少个相同的值
+     * @param value 对象
+     * @return
+     */
+    public Long removeList(String key, long count, Object value){
+<span class="nc" id="L195">        return redisTemplate.opsForList().remove(key, count, value);</span>
+    }
+
+    /**
+     * 获取List中元素个数
+     * @param key
+     * @return
+     */
+    public Long sizeList(String key){
+<span class="nc" id="L204">        return redisTemplate.opsForList().size(key);</span>
+    }
+
+    /**
+     * 将元素加到队头
+     * @param key
+     * @param value
+     * @return
+     */
+    public long leftPushList(String key, Serializable value){
+<span class="nc" id="L214">        return redisTemplate.opsForList().leftPush(key, value);</span>
+    }
+
+    /**
+     * 将多个元素加到队头
+     * @param key
+     * @param values
+     * @return
+     */
+    public long leftPushAllList(String key, Serializable... values){
+<span class="nc" id="L224">        return redisTemplate.opsForList().leftPushAll(key, values);</span>
+    }
+
+    /**
+     * 将元素加到队尾
+     * @param key
+     * @param value
+     * @return
+     */
+    public long rightPushList(String key, Serializable value){
+<span class="nc" id="L234">        return redisTemplate.opsForList().rightPush(key, value);</span>
+    }
+
+    /**
+     * 将多个元素加到队尾
+     * @param key
+     * @param values
+     * @return
+     */
+    public long rightPushAllList(String key, Serializable... values){
+<span class="nc" id="L244">        return redisTemplate.opsForList().rightPushAll(key, values);</span>
+    }
+
+    public Serializable leftPopList(String key){
+<span class="nc" id="L248">        return redisTemplate.opsForList().leftPop(key);</span>
+    }
+
+    /**
+     * 执行脚本
+     * @param script
+     * @param keyList
+     * @param values
+     * @return
+     */
+    public &lt;T&gt; T executeScript(DefaultRedisScript&lt;T&gt; script,List&lt;String&gt; keyList, Object... values){
+<span class="nc" id="L259">        return redisTemplate.execute(script,keyList,values);</span>
+    }
+
+    /**
+     * 获得hash值
+     * @author Ming Qiu
+     * &lt;p&gt;
+     * date: 2022-11-09 22:45
+     * @param key
+     * @param field
+     * @param value
+     */
+    public void setHash(String key, String field, Serializable value){
+<span class="nc" id="L272">        redisTemplate.opsForHash().put(key, field, value);</span>
+<span class="nc" id="L273">    }</span>
+
+    /**
+     * 设置哈希值
+     * @author Ming Qiu
+     * &lt;p&gt;
+     * date: 2022-11-09 22:45
+     * @param key
+     * @param field
+     * @return
+     */
+    public Serializable getHash(String key, String field) {
+<span class="nc" id="L285">        return (Serializable) redisTemplate.opsForHash().get(key, field);</span>
+    }
+
+    public boolean getBit(String key, long offset){
+<span class="nc" id="L289">        return redisTemplate.opsForValue().getBit(key, offset);</span>
+    }
+
+    public boolean setBit(String key, long offset, boolean value){
+<span class="nc" id="L293">        return redisTemplate.opsForValue().setBit(key, offset, value);</span>
+    }
+
+
+    /**
+     * bitCount的操作是不会涉及到底层的位数组的扩充的，也就是说没有最大值，没有限制
+     * bitCount一般联合SETBIT一起使用，SETBIT有容量限制
+     * SETBIT参考 https://redis.io/commands/setbit/
+     * 当前最大的位数为  2^32 (this limits bitmaps to 512MB)，
+     * 使用bitSet的时候可以使用更多的key，来支持更多的位数， n*2^32 , N为key的数量
+     * @param key
+     * @param start
+     * @param end
+     * @return
+     */
+    public long bitCount(String key, long start, long end){
+<span class="nc" id="L309">        return (long) redisTemplate.execute((RedisCallback&lt;Long&gt;) connection -&gt; connection.bitCount(key.getBytes(), start, end));</span>
+    }
+
+    public Long bitAnd(String destKey, String... keys){
+<span class="nc" id="L313">        byte[][] bytes = new byte[keys.length][];</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">        for (int i = 0; i &lt; keys.length; i++) {</span>
+<span class="nc" id="L315">            bytes[i] = keys[i].getBytes();</span>
+        }
+<span class="nc" id="L317">        return redisTemplate.execute((RedisCallback&lt;Long&gt;) connection -&gt; connection.bitOp(BitOperation.AND, destKey.getBytes(), bytes));</span>
+    }
+
+    public Long bitOr(String destKey, String... keys){
+<span class="nc" id="L321">        byte[][] bytes = new byte[keys.length][];</span>
+<span class="nc bnc" id="L322" title="All 2 branches missed.">        for (int i = 0; i &lt; keys.length; i++) {</span>
+<span class="nc" id="L323">            bytes[i] = keys[i].getBytes();</span>
+        }
+<span class="nc" id="L325">        return redisTemplate.execute((RedisCallback&lt;Long&gt;) connection -&gt; connection.bitOp(BitOperation.OR, destKey.getBytes(), bytes));</span>
+    }
+
+    /**
+     *  Creates an empty Bloom Filter with a single sub-filter for the initial capacity requested and with an upper bound error_rate.
+     *  By default, the filter auto-scales by creating additional sub-filters when capacity is reached. The new sub-filter is created with size of the previous sub-filter multiplied by expansion.
+     * @author Ming Qiu
+     * &lt;p&gt;
+     * date: 2022-11-27 9:39
+     * @param key
+     * @param errorRate
+     * @param capacity
+     * @param expansion
+     * @return
+     */
+
+    //不需要修改
+    public Object bfReserve(String key, float errorRate, long capacity, boolean expansion){
+<span class="nc" id="L343">        byte[][] valueBytes = new byte[5][];</span>
+<span class="nc" id="L344">        valueBytes[0]= String.valueOf(key).getBytes();</span>
+<span class="nc" id="L345">        valueBytes[1]= String.valueOf(errorRate).getBytes();</span>
+<span class="nc" id="L346">        valueBytes[2] = String.valueOf(capacity).getBytes();</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">        if (expansion){</span>
+<span class="nc" id="L348">            valueBytes[3] = &quot;EXPANSION&quot;.getBytes();</span>
+<span class="nc" id="L349">            valueBytes[4] = String.valueOf(2).getBytes();</span>
+        }else{
+<span class="nc" id="L351">            valueBytes[3] = &quot;NONSCALING&quot;.getBytes();</span>
+        }
+<span class="nc" id="L353">        return redisTemplate.execute((RedisCallback) connection -&gt; connection.execute(&quot;BF.RESERVE&quot;, valueBytes));</span>
+    }
+
+
+    /**
+     *  往bloom过滤器中增加值
+     * @author Ming Qiu
+     * &lt;p&gt;
+     * date: 2022-11-27 8:26
+     * @param key
+     * @param value
+     * @return
+     */
+    public Object bfAdd(String key, Serializable value){
+
+        /**
+         * 这个版本的redis客户端不能处理bloomfilter，需要扩展command来处理,
+         * 使用底层client来扩展处理逻辑
+         * tips：redis有数据协议标准 ,每个command的请求响应的数据结构不一样，
+         * 经查阅资料可知：现在的客户端不能处理 bf:XXX相关的操作
+         */
+
+<span class="nc" id="L375">        return redisTemplate.execute(new RedisCallback&lt;Object&gt;() {</span>
+
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+
+<span class="nc" id="L380">                RedisAsyncCommandsImpl redisAsyncCommands = (RedisAsyncCommandsImpl) connection.getNativeConnection();</span>
+<span class="nc" id="L381">                StatefulConnection connect = redisAsyncCommands.getConnection();</span>
+<span class="nc" id="L382">                RedisCommandFactory redisCommandFactory = new RedisCommandFactory(connect);</span>
+<span class="nc" id="L383">                BloomFilterCommands bloomFilterCommands = redisCommandFactory.getCommands(BloomFilterCommands.class);</span>
+<span class="nc" id="L384">                Boolean bfAdd = bloomFilterCommands.bfAdd(key, String.valueOf(value));</span>
+<span class="nc" id="L385">                return bfAdd;</span>
+            }
+        });
+
+
+//        byte[] byteValue = JacksonUtil.toJson(value).getBytes();
+//        LettuceClusterConnection lettuceConnection= (LettuceClusterConnection) redisConnection;
+//        StatefulRedisConnection&lt;String, String&gt; connect = lettuceConnection.connect();
+//        RedisCommandFactory redisCommandFactory = new RedisCommandFactory(lettuceConnection.g());
+//        BloomFilterCommands commands = redisCommandFactory.getCommands(BloomFilterCommands.class);
+//        return commands.bfAdd(key, (String) value);
+//        return redisTemplate.execute((RedisCallback) connection -&gt; connection.execute(&quot;BF.ADD&quot;, key.getBytes(), byteValue));
+    }
+
+    /**
+     * 判断Bloom过滤器中是否存在值
+     * https://github.com/RedisBloom/RedisBloom
+     * @author Ming Qiu
+     * &lt;p&gt;
+     * date: 2022-11-27 8:29
+     * @param key
+     * @param value
+     * @return
+     */
+    public Boolean bfExist(String key, Serializable value){
+
+        /**
+         * 这个版本的redis客户端不能处理bloomfilter，需要扩展command来处理,
+         * 使用底层client来扩展处理逻辑
+         * tips：redis有数据协议标准 ,每个command的请求响应的数据结构不一样，
+         * 经查阅资料可知：现在的客户端不能处理 bf:XXX相关的操作
+         */
+<span class="nc" id="L417">        return (Boolean) redisTemplate.execute(new RedisCallback&lt;Object&gt;() {</span>
+
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+
+<span class="nc" id="L422">                RedisAsyncCommandsImpl redisAsyncCommands = (RedisAsyncCommandsImpl) connection.getNativeConnection();</span>
+<span class="nc" id="L423">                StatefulConnection connect = redisAsyncCommands.getConnection();</span>
+<span class="nc" id="L424">                RedisCommandFactory redisCommandFactory = new RedisCommandFactory(connect);</span>
+<span class="nc" id="L425">                BloomFilterCommands bloomFilterCommands = redisCommandFactory.getCommands(BloomFilterCommands.class);</span>
+<span class="nc" id="L426">                Boolean bfAdd = bloomFilterCommands.bfExists(key, String.valueOf(value));</span>
+<span class="nc" id="L427">                return bfAdd;</span>
+            }
+        });
+
+//        String valueString = JacksonUtil.toJson(value);
+//        return this.bfExist(key, valueString);
+    }
+
+    public Boolean bfExist(String key, Long value){
+<span class="nc" id="L436">        String valueString= String.valueOf(value);</span>
+<span class="nc" id="L437">        return this.bfExist(key, value.shortValue());</span>
+    }
+
+    public Boolean bfExist(String key, String value){
+
+<span class="nc" id="L442">        return (Boolean) redisTemplate.execute(new RedisCallback&lt;Object&gt;() {</span>
+
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+
+<span class="nc" id="L447">                RedisAsyncCommandsImpl redisAsyncCommands = (RedisAsyncCommandsImpl) connection.getNativeConnection();</span>
+<span class="nc" id="L448">                StatefulConnection connect = redisAsyncCommands.getConnection();</span>
+<span class="nc" id="L449">                RedisCommandFactory redisCommandFactory = new RedisCommandFactory(connect);</span>
+<span class="nc" id="L450">                BloomFilterCommands bloomFilterCommands = redisCommandFactory.getCommands(BloomFilterCommands.class);</span>
+<span class="nc" id="L451">                Boolean bfAdd = bloomFilterCommands.bfExists(key, String.valueOf(value));</span>
+<span class="nc" id="L452">                return bfAdd;</span>
+            }
+        });
+
+//        byte[] byteValue = value.getBytes();
+//        return (Boolean) redisTemplate.execute((RedisCallback) connection -&gt; connection.execute(&quot;BF.EXISTS&quot;, key.getBytes(), byteValue));
+//        return (Boolean) redisTemplate.execute((RedisCallback) connection -&gt; connection.execute(&quot;BF.EXISTS&quot;, key, value));
+    }
+
+    /**
+     * 随机化 key 过期时间
+     * @param timeout 过期时间
+     * @return 随机化后的过期时间
+     */
+    private long randomizeTimeout(long timeout) {
+<span class="nc" id="L467">        long min = 1;</span>
+<span class="nc" id="L468">        long max = timeout / 5;</span>
+<span class="nc" id="L469">        return timeout + (long) (new Random().nextDouble() * (max - min));</span>
+    }
+
+    /**
+     * @author Chen Linghui
+     * @Task-2023-dgnfree-006
+     * 建立连接，然后查询，实现批处理
+     * @param keyList
+     * @return
+     */
+    public List&lt;Object&gt; getByList(List&lt;String&gt; keyList){
+
+<span class="nc" id="L481">        return redisTemplate.executePipelined((RedisCallback&lt;Object&gt;) connection -&gt; {</span>
+            // 执行多个Redis命令
+<span class="nc" id="L483">            keyList.stream().forEach(key-&gt;{</span>
+<span class="nc" id="L484">                connection.exists(key.getBytes());</span>
+<span class="nc" id="L485">                connection.get(key.getBytes());</span>
+<span class="nc" id="L486">            });</span>
+            // 返回null表示不需要在这里返回结果
+<span class="nc" id="L488">            return null;</span>
+        });
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

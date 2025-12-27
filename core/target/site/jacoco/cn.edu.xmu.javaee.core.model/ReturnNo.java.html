@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReturnNo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.javaee.core.model</a> &gt; <span class="el_source">ReturnNo.java</span></div><h1>ReturnNo.java</h1><pre class="source lang-java linenums">//School of Informatics Xiamen University, GPL-3.0 license
+package cn.edu.xmu.javaee.core.model;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 各模块公用的错误码
+ * @author Ming Qiu
+ */
+<span class="nc" id="L11">public enum ReturnNo {</span>
+
+<span class="nc" id="L13">    OK(0,&quot;ReturnNo.OK&quot;),</span>
+<span class="nc" id="L14">    BAD_REQUEST(400, &quot;ReturnNo.BAD_REQUEST&quot;, 400),</span>
+<span class="nc" id="L15">    RESOURCE_NOT_FOUND(404, &quot;ReturnNo.RESOURCE_NOT_FOUND&quot;, 404),</span>
+<span class="nc" id="L16">    CREATED(1, &quot;ReturnNo.CREATED&quot;, 201),</span>
+<span class="nc" id="L17">    INTERNAL_SERVER_ERR(2, &quot;ReturnNo.INTERNAL_SERVER_ERR&quot;,500),</span>
+<span class="nc" id="L18">    FIELD_NOTVALID(3, &quot;ReturnNo.FIELD_NOTVALID&quot;,400),</span>
+<span class="nc" id="L19">    RESOURCE_ID_NOTEXIST(4, &quot;ReturnNo.RESOURCE_ID_NOTEXIST&quot;,404),</span>
+<span class="nc" id="L20">    STATENOTALLOW(7,&quot;ReturnNo.STATENOTALLOW&quot;),</span>
+<span class="nc" id="L21">    RESOURCE_ID_OUTSCOPE(17, &quot;ReturnNo.RESOURCE_ID_OUTSCOPE&quot;,403),</span>
+<span class="nc" id="L22">    CREATEOBJ_NOTEXIST(18, &quot;ReturnNo.CREATEOBJ_NOTEXIST&quot;),</span>
+<span class="nc" id="L23">    SAMEOBJECT(19, &quot;ReturnNo.SAMEOBJECT&quot;),</span>
+<span class="nc" id="L24">    APPLICATION_PARAM_ERR(24, &quot;ReturnNo.APPLICATION_PARAM_ERR&quot;,500),</span>
+<span class="nc" id="L25">    UPLOAD_FILE_FAILED(28, &quot;ReturnNo.UPLOAD_FILE_FAILED&quot;),</span>
+<span class="nc" id="L26">    GET_FILE_FAILED(29, &quot;ReturnNo.GET_FILE_FAILED&quot;),</span>
+<span class="nc" id="L27">    DEL_FILE_FAILED(30, &quot;ReturnNo.DEL_FILE_FAILED&quot;),</span>
+<span class="nc" id="L28">    EXISTED_RELATION(31, &quot;ReturnNo.EXISTED_RELATION&quot;),</span>
+<span class="nc" id="L29">    INCONSISTENT_DATA(5, &quot;ReturnNo.INCONSISTENT_DATA&quot;),</span>
+
+    /**************************************
+     *  支付模块
+     ************************************/
+<span class="nc" id="L34">    PAY_CHANNEL_INVALID(102,&quot;%s支付渠道无效&quot;),</span>
+<span class="nc" id="L35">    PAY_CHANNEL_EXIST(103,&quot;商铺(id=%d)的支付渠道(id=%d)已经存在&quot;),</span>
+<span class="nc" id="L36">    PAY_REFUND_MORE(104,&quot;退款金额超过支付对象(id=%d)的金额&quot;),</span>
+<span class="nc" id="L37">    PAY_DIVREFUND_MORE(105,&quot;分账退回金额超过支付对象(id=%d)的支付分账金额&quot;),</span>
+
+<span class="nc" id="L39">    PAY_INVOKEAPI_ERROR(106, &quot;调用%s接口失败&quot;),</span>
+
+    /***************************************************
+     *    商铺模块错误码
+     **************************************************/
+<span class="nc" id="L44">    SHOP_USER_HASSHOP(199,&quot;用户(id= %d)已经有店铺&quot;),</span>
+<span class="nc" id="L45">    FREIGHT_REGION_NOTREACH(198,&quot;该地区不可达（包括暂停和不在配送范围）&quot;),</span>
+<span class="nc" id="L46">    FREIGHT_REGIONOBSOLETE(197,&quot;地区已废弃&quot;),</span>
+<span class="nc" id="L47">    FREIGHT_TEMPLATENOTMATCH(196,&quot;运费模板的类型不匹配&quot;),</span>
+<span class="nc" id="L48">    FREIGHT_REGIONEXIST(195,&quot;该运费模板中该地区(id=%d)已经定义&quot;),</span>
+
+
+
+    /***************************************************
+     *    商品模块错误码
+     **************************************************/
+<span class="nc" id="L55">    CATEGORY_NOTPERMIT(201, &quot;分类(id = %d)不允许增加新的下级分类&quot;),</span>
+<span class="nc" id="L56">    CATEGORY_SAME(202, &quot;类目(id = %d)名称已存在&quot;),</span>
+<span class="nc" id="L57">    CATEGORY_NOTALLOW(203, &quot;商品不允许加入到一级分类(id = %d)&quot;),</span>
+
+
+<span class="nc" id="L60">    SHARE_UNSHARABLE(214, &quot;货品不可分享&quot;),</span>
+<span class="nc" id="L61">    ADVSALE_NOTCOEXIST(215, &quot;预售不能与销售(id=%d)中的其他活动共存&quot;),</span>
+<span class="nc" id="L62">    GROUPON_NOTCOEXIST(216, &quot;团购不能与销售(id=%d)中的其他活动共存&quot;),</span>
+
+<span class="nc" id="L64">    GOODS_STOCK_SHORTAGE(296,&quot;货品（id = %d）库存不足&quot;),</span>
+<span class="nc" id="L65">    GOODS_ONSALE_NOTEFFECTIVE(297, &quot;货品(id=%d)不在有效的销售状态和时间&quot;),</span>
+<span class="nc" id="L66">    GOODS_ONSALE_CONFLICT(299,&quot;与销售(id = %d)时间冲突&quot;),</span>
+
+<span class="nc" id="L68">    LATE_BEGINTIME(19, &quot;开始时间不能晚于结束时间&quot;),</span>
+<span class="nc" id="L69">    ADV_SALE_TIMELATE(220, &quot;尾款支付时间晚于活动结束时间&quot;),</span>
+<span class="nc" id="L70">    ADV_SALE_TIMEEARLY(221, &quot;尾款支付时间早于活动开始时间&quot;),</span>
+<span class="nc" id="L71">    COUPON_TIMELATE(217, &quot;优惠卷领卷时间晚于活动开始时间&quot;),</span>
+    /***************************************************
+     *    顾客模块错误码
+     **************************************************/
+<span class="nc" id="L75">    ADDRESS_OUTLIMIT(601,&quot;达到地址簿上限&quot;),</span>
+
+<span class="nc" id="L77">    ORDERITEM_NOTSHARED(606,&quot;订单明细无分享记录&quot;),</span>
+<span class="nc" id="L78">    CUSTOMERID_NOTEXIST(608,&quot;登录用户id不存在&quot;),</span>
+<span class="nc" id="L79">    CUSTOMER_INVALID_ACCOUNT(609, &quot;用户名不存在或者密码错误&quot;),</span>
+<span class="nc" id="L80">    CUSTOMER_FORBIDDEN(610,&quot;用户被禁止登录&quot;),</span>
+<span class="nc" id="L81">    CUSTOMER_NAMEEXIST(611,&quot;用户名已被注册&quot;),</span>
+<span class="nc" id="L82">    CUSTOMER_PASSWORDSAME(612,&quot;不能与旧密码相同&quot;),</span>
+<span class="nc" id="L83">    CUSTOMER_MOBILEEXIST(613,&quot;电话已被注册&quot;),</span>
+<span class="nc" id="L84">    CUSTOMER_MOBILEDIFF(614,&quot;与系统预留的电话不一致&quot;),</span>
+<span class="nc" id="L85">    CUSTOMER_CARTNOTALLOW(615,&quot;商品(id = %d)不能加入购物车&quot;),</span>
+
+<span class="nc" id="L87">    COUPON_NOTBEGIN(696,&quot;未到优惠卷领取时间&quot;),</span>
+<span class="nc" id="L88">    COUPON_FINISH(697,&quot;优惠卷领罄&quot;),</span>
+<span class="nc" id="L89">    COUPON_END(698,&quot;优惠卷活动终止&quot;),</span>
+<span class="nc" id="L90">    COUPON_EXIST(699,&quot;不可重复领优惠卷&quot;),</span>
+    /**************************************
+     *  售后模块
+     ************************************/
+<span class="nc" id="L94">    AFTERSALE_NOT_FOUND(706, &quot;ReturnNo.AFTERSALE_NOT_FOUND&quot;),</span>
+<span class="nc" id="L95">    AFTERSALE_STATE_INVALID(707, &quot;ReturnNo.AFTERSALE_STATE_INVALID&quot;),</span>
+<span class="nc" id="L96">    ARBITRATION_NOTSELF(701, &quot;仲裁(id=%d)非本用户受理的仲裁&quot;),</span>
+<span class="nc" id="L97">    ARBITRATION_NOT_APPLICANT(702, &quot;仲裁(id=%d)仅申请人可以撤销&quot;),</span>
+<span class="nc" id="L98">    AFTERSALE_NOT_RETURNCHANGE(703, &quot;(id=%d)不是退换货售后&quot;),</span>
+<span class="nc" id="L99">    AFTERSALE_NOT_SELFSENDBACK(704, &quot;(id=%d)不是自行寄回售后&quot;),</span>
+<span class="nc" id="L100">    AFTERSALE_INARBITRATION(705, &quot;售后(id=%d)在仲裁中&quot;),</span>
+
+    /**************************************
+     *  服务模块
+     ************************************/
+<span class="nc" id="L105">    SERVICE_DRAFT_NOT_FOUND(751, &quot;ReturnNo.SERVICE_DRAFT_NOT_FOUND&quot;),</span>
+<span class="nc" id="L106">    SERVICE_DRAFT_STATE_INVALID(752, &quot;ReturnNo.SERVICE_DRAFT_STATE_INVALID&quot;),</span>
+
+
+    /***************************************************
+     *    订单模块错误码
+     **************************************************/
+<span class="nc" id="L112">    ORDER_CHANGENOTALLOW(801,&quot;订单(id=%d)地址费用变化&quot;),</span>
+<span class="nc" id="L113">    ITEM_OVERMAXQUANTITY(802,&quot;销售对象(id=%d)的数量(%d)操过单次可购买数量(%d)&quot;),</span>
+
+
+    /**************************************
+     *  地区模块
+     ************************************/
+<span class="nc" id="L119">    REGION_ABANDONE(901, &quot;地区(id=%d)已废弃&quot;),</span>
+<span class="nc" id="L120">    REGION_INVALID(902, &quot;地区(id=%d)不是有效状态&quot;),</span>
+
+
+    /**************************************
+     *  物流模块
+     ************************************/
+<span class="nc" id="L126">    FREIGHT_WAREHOUSEREGION_EXIST(997, &quot;重复设置地区&quot;),</span>
+<span class="nc" id="L127">    FREIGHT_WAREHOUSELOGISTIC_EXIST(998, &quot;重复设置物流&quot;),</span>
+<span class="nc" id="L128">    FREIGHT_LOGISTIC_EXIST(999, &quot;商铺已存在物流(id=%d)&quot;);</span>
+
+
+    private int errNo;
+    private String message;
+<span class="nc" id="L133">    private int httpStatus = 200;</span>
+
+    private static final Map&lt;Integer, ReturnNo&gt; returnNoMap;
+    static {
+<span class="nc" id="L137">        returnNoMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">        for (ReturnNo enum1 : values()) {</span>
+<span class="nc" id="L139">            returnNoMap.put(enum1.errNo, enum1);</span>
+        }
+<span class="nc" id="L141">    }</span>
+
+<span class="nc" id="L143">    ReturnNo(int code, String message, int httpStatus ){</span>
+<span class="nc" id="L144">        this.errNo = code;</span>
+<span class="nc" id="L145">        this.message = message;</span>
+<span class="nc" id="L146">        this.httpStatus = httpStatus;</span>
+<span class="nc" id="L147">    }</span>
+
+<span class="nc" id="L149">    ReturnNo(int code, String message){</span>
+<span class="nc" id="L150">        this.errNo = code;</span>
+<span class="nc" id="L151">        this.message = message;</span>
+<span class="nc" id="L152">        this.httpStatus = 200;</span>
+<span class="nc" id="L153">    }</span>
+
+    public static ReturnNo getReturnNoByCode(int code){
+<span class="nc" id="L156">        return returnNoMap.get(code);</span>
+    }
+
+    public int getErrNo() {
+<span class="nc" id="L160">        return errNo;</span>
+    }
+
+    public int getCode() {
+<span class="nc" id="L164">        return errNo;</span>
+    }
+
+    public String getMessage(){
+<span class="nc" id="L168">        return message;</span>
+    }
+
+<span class="nc" id="L171">    public int getHttpStatus() {return httpStatus;}</span>
+    }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

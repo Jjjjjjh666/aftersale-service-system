@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReturnObject.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.javaee.core.model</a> &gt; <span class="el_source">ReturnObject.java</span></div><h1>ReturnObject.java</h1><pre class="source lang-java linenums">//School of Informatics Xiamen University, GPL-3.0 license
+package cn.edu.xmu.javaee.core.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+
+/**
+ * 返回对象
+ * @author Ming Qiu
+ **/
+@Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ReturnObject {
+
+    /**
+     * 错误号
+     */
+    @JsonIgnore
+    ReturnNo code;
+
+    /**
+     * 自定义的错误码
+     */
+    @JsonProperty(value = &quot;errmsg&quot;)
+    String errMsg;
+
+    /**
+     * 返回值
+     */
+<span class="nc" id="L32">    @JsonProperty(value = &quot;data&quot;)</span>
+    private Object data = null;
+
+    /**
+     * 默认构造函数，错误码为OK
+     */
+<span class="nc" id="L38">    public ReturnObject() {</span>
+<span class="nc" id="L39">        this.code = ReturnNo.OK;</span>
+<span class="nc" id="L40">        this.errMsg = ReturnNo.OK.getMessage();</span>
+<span class="nc" id="L41">    }</span>
+
+    /**
+     * 带值构造函数
+     * @param data 返回值
+     */
+    public ReturnObject(Object data) {
+<span class="nc" id="L48">        this();</span>
+<span class="nc" id="L49">        this.data = data;</span>
+<span class="nc" id="L50">    }</span>
+
+    /**
+     * 有错误码的构造函数
+     * @param code 错误码
+     */
+<span class="nc" id="L56">    public ReturnObject(ReturnNo code) {</span>
+<span class="nc" id="L57">        this.code = code;</span>
+<span class="nc" id="L58">        this.errMsg = code.getMessage();</span>
+<span class="nc" id="L59">    }</span>
+
+    /**
+     * 有错误码和自定义message的构造函数
+     * @param code 错误码
+     * @param errMsg 自定义message
+     */
+    public ReturnObject(ReturnNo code, String errMsg) {
+<span class="nc" id="L67">        this(code);</span>
+<span class="nc" id="L68">        this.errMsg = errMsg;</span>
+<span class="nc" id="L69">    }</span>
+
+    /**
+     * 有错误码，自定义message和值的构造函数
+     * @param code 错误码
+     * @param data 返回值
+     */
+    public ReturnObject(ReturnNo code, Object data) {
+<span class="nc" id="L77">        this(code);</span>
+<span class="nc" id="L78">        this.data = data;</span>
+<span class="nc" id="L79">    }</span>
+
+    /**
+     * 有错误码，自定义message和值的构造函数
+     * @param code 错误码
+     * @param errMsg 自定义message
+     * @param data 返回值
+     */
+    public ReturnObject(ReturnNo code, String errMsg, Object data) {
+<span class="nc" id="L88">        this(code, errMsg);</span>
+<span class="nc" id="L89">        this.data = data;</span>
+<span class="nc" id="L90">    }</span>
+
+    /**
+     * 快捷构造成功响应（无数据）
+     */
+    public static ReturnObject success() {
+<span class="nc" id="L96">        return new ReturnObject();</span>
+    }
+
+    /**
+     * 快捷构造成功响应（带数据）
+     */
+    public static ReturnObject success(Object data) {
+<span class="nc" id="L103">        return new ReturnObject(data);</span>
+    }
+
+    /**
+     * 快捷构造错误响应（默认错误消息）
+     */
+    public static ReturnObject error(ReturnNo code) {
+<span class="nc" id="L110">        return new ReturnObject(code);</span>
+    }
+
+    /**
+     * 快捷构造错误响应（自定义错误消息）
+     */
+    public static ReturnObject error(ReturnNo code, String errMsg) {
+<span class="nc" id="L117">        return new ReturnObject(code, errMsg);</span>
+    }
+
+
+    /**
+     * 错误码
+     * @return 错误码
+     */
+    @JsonProperty(value = &quot;errno&quot;)
+    public int getErrno(){
+<span class="nc" id="L127">        return this.code.getErrNo();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

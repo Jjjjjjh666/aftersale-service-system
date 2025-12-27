@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="cn.edu.xmu.aftersale.controller.AftersaleControllerWebTest$ConfirmAftersaleTests" time="2.198" tests="3" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/Users/jhlee/Desktop/ooad/aftersale-service-system/aftersale/target/test-classes:/Users/jhlee/Desktop/ooad/aftersale-service-system/aftersale/target/classes:/Users/jhlee/Desktop/ooad/aftersale-service-system/core/target/classes:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-actuator/3.2.5/spring-boot-starter-actuator-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-actuator-autoconfigure/3.2.5/spring-boot-actuator-autoconfigure-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-actuator/3.2.5/spring-boot-actuator-3.2.5.jar:/Users/jhlee/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar:/Users/jhlee/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar:/Users/jhlee/.m2/repository/io/micrometer/micrometer-jakarta9/1.12.5/micrometer-jakarta9-1.12.5.jar:/Users/jhlee/.m2/repository/io/micrometer/micrometer-core/1.12.5/micrometer-core-1.12.5.jar:/Users/jhlee/.m2/repository/org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.jar:/Users/jhlee/.m2/repository/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-aop/3.2.5/spring-boot-starter-aop-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar:/Users/jhlee/.m2/repository/org/aspectj/aspectjweaver/1.9.22/aspectjweaver-1.9.22.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-data-redis/3.2.5/spring-boot-starter-data-redis-3.2.5.jar:/Users/jhlee/.m2/repository/io/lettuce/lettuce-core/6.3.2.RELEASE/lettuce-core-6.3.2.RELEASE.jar:/Users/jhlee/.m2/repository/io/netty/netty-common/4.1.109.Final/netty-common-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-handler/4.1.109.Final/netty-handler-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-resolver/4.1.109.Final/netty-resolver-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-buffer/4.1.109.Final/netty-buffer-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-transport-native-unix-common/4.1.109.Final/netty-transport-native-unix-common-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-codec/4.1.109.Final/netty-codec-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-transport/4.1.109.Final/netty-transport-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/projectreactor/reactor-core/3.6.5/reactor-core-3.6.5.jar:/Users/jhlee/.m2/repository/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar:/Users/jhlee/.m2/repository/org/springframework/data/spring-data-redis/3.2.5/spring-data-redis-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/data/spring-data-keyvalue/3.2.5/spring-data-keyvalue-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/spring-tx/6.1.6/spring-tx-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-oxm/6.1.6/spring-oxm-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-context-support/6.1.6/spring-context-support-6.1.6.jar:/Users/jhlee/.m2/repository/com/auth0/java-jwt/4.4.0/java-jwt-4.4.0.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4.jar:/Users/jhlee/.m2/repository/com/github/pagehelper/pagehelper-spring-boot-starter/2.1.0/pagehelper-spring-boot-starter-2.1.0.jar:/Users/jhlee/.m2/repository/com/github/pagehelper/pagehelper-spring-boot-autoconfigure/2.1.0/pagehelper-spring-boot-autoconfigure-2.1.0.jar:/Users/jhlee/.m2/repository/com/github/pagehelper/pagehelper/6.1.0/pagehelper-6.1.0.jar:/Users/jhlee/.m2/repository/com/github/jsqlparser/jsqlparser/4.7/jsqlparser-4.7.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-starter-loadbalancer/4.1.2/spring-cloud-starter-loadbalancer-4.1.2.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-loadbalancer/4.1.2/spring-cloud-loadbalancer-4.1.2.jar:/Users/jhlee/.m2/repository/io/projectreactor/addons/reactor-extra/3.5.1/reactor-extra-3.5.1.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-cache/3.2.5/spring-boot-starter-cache-3.2.5.jar:/Users/jhlee/.m2/repository/com/stoyanr/evictor/1.0.0/evictor-1.0.0.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/3.2.5/spring-boot-starter-data-jpa-3.2.5.jar:/Users/jhlee/.m2/repository/org/hibernate/orm/hibernate-core/6.4.4.Final/hibernate-core-6.4.4.Final.jar:/Users/jhlee/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/Users/jhlee/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/Users/jhlee/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/Users/jhlee/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/Users/jhlee/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.5/jaxb-runtime-4.0.5.jar:/Users/jhlee/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.5/jaxb-core-4.0.5.jar:/Users/jhlee/.m2/repository/org/eclipse/angus/angus-activation/2.0.2/angus-activation-2.0.2.jar:/Users/jhlee/.m2/repository/org/glassfish/jaxb/txw2/4.0.5/txw2-4.0.5.jar:/Users/jhlee/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/Users/jhlee/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/Users/jhlee/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/Users/jhlee/.m2/repository/org/springframework/data/spring-data-jpa/3.2.5/spring-data-jpa-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/data/spring-data-commons/3.2.5/spring-data-commons-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/spring-orm/6.1.6/spring-orm-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-aspects/6.1.6/spring-aspects-6.1.6.jar:/Users/jhlee/.m2/repository/com/squareup/javapoet/1.13.0/javapoet-1.13.0.jar:/Users/jhlee/.m2/repository/com/google/auto/service/auto-service/1.1.1/auto-service-1.1.1.jar:/Users/jhlee/.m2/repository/com/google/auto/service/auto-service-annotations/1.1.1/auto-service-annotations-1.1.1.jar:/Users/jhlee/.m2/repository/com/google/auto/auto-common/1.2.1/auto-common-1.2.1.jar:/Users/jhlee/.m2/repository/com/google/guava/guava/32.0.1-jre/guava-32.0.1-jre.jar:/Users/jhlee/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/Users/jhlee/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/Users/jhlee/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/Users/jhlee/.m2/repository/org/checkerframework/checker-qual/3.33.0/checker-qual-3.33.0.jar:/Users/jhlee/.m2/repository/com/google/errorprone/error_prone_annotations/2.18.0/error_prone_annotations-2.18.0.jar:/Users/jhlee/.m2/repository/com/google/j2objc/j2objc-annotations/2.8/j2objc-annotations-2.8.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.2.5/spring-boot-starter-web-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter/3.2.5/spring-boot-starter-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.2.5/spring-boot-starter-logging-3.2.5.jar:/Users/jhlee/.m2/repository/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14.jar:/Users/jhlee/.m2/repository/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14.jar:/Users/jhlee/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.21.1/log4j-to-slf4j-2.21.1.jar:/Users/jhlee/.m2/repository/org/apache/logging/log4j/log4j-api/2.21.1/log4j-api-2.21.1.jar:/Users/jhlee/.m2/repository/org/slf4j/jul-to-slf4j/2.0.13/jul-to-slf4j-2.0.13.jar:/Users/jhlee/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/Users/jhlee/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.2.5/spring-boot-starter-json-3.2.5.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.15.4/jackson-datatype-jdk8-2.15.4.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.4/jackson-datatype-jsr310-2.15.4.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.15.4/jackson-module-parameter-names-2.15.4.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.2.5/spring-boot-starter-tomcat-3.2.5.jar:/Users/jhlee/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.20/tomcat-embed-core-10.1.20.jar:/Users/jhlee/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.20/tomcat-embed-websocket-10.1.20.jar:/Users/jhlee/.m2/repository/org/springframework/spring-web/6.1.6/spring-web-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-webmvc/6.1.6/spring-webmvc-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.2.5/spring-boot-starter-validation-3.2.5.jar:/Users/jhlee/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.20/tomcat-embed-el-10.1.20.jar:/Users/jhlee/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.1.Final/hibernate-validator-8.0.1.Final.jar:/Users/jhlee/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/Users/jhlee/.m2/repository/org/jboss/logging/jboss-logging/3.5.3.Final/jboss-logging-3.5.3.Final.jar:/Users/jhlee/.m2/repository/com/fasterxml/classmate/1.6.0/classmate-1.6.0.jar:/Users/jhlee/.m2/repository/org/mybatis/spring/boot/mybatis-spring-boot-starter/3.0.3/mybatis-spring-boot-starter-3.0.3.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.2.5/spring-boot-starter-jdbc-3.2.5.jar:/Users/jhlee/.m2/repository/com/zaxxer/HikariCP/5.0.1/HikariCP-5.0.1.jar:/Users/jhlee/.m2/repository/org/springframework/spring-jdbc/6.1.6/spring-jdbc-6.1.6.jar:/Users/jhlee/.m2/repository/org/mybatis/spring/boot/mybatis-spring-boot-autoconfigure/3.0.3/mybatis-spring-boot-autoconfigure-3.0.3.jar:/Users/jhlee/.m2/repository/org/mybatis/mybatis/3.5.14/mybatis-3.5.14.jar:/Users/jhlee/.m2/repository/org/mybatis/mybatis-spring/3.0.3/mybatis-spring-3.0.3.jar:/Users/jhlee/.m2/repository/com/mysql/mysql-connector-j/9.0.0/mysql-connector-j-9.0.0.jar:/Users/jhlee/.m2/repository/com/google/protobuf/protobuf-java/4.26.1/protobuf-java-4.26.1.jar:/Users/jhlee/.m2/repository/com/alibaba/druid-spring-boot-3-starter/1.2.27/druid-spring-boot-3-starter-1.2.27.jar:/Users/jhlee/.m2/repository/com/alibaba/druid/1.2.27/druid-1.2.27.jar:/Users/jhlee/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar:/Users/jhlee/.m2/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-starter-openfeign/4.1.1/spring-cloud-starter-openfeign-4.1.1.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-starter/4.1.2/spring-cloud-starter-4.1.2.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-context/4.1.2/spring-cloud-context-4.1.2.jar:/Users/jhlee/.m2/repository/org/springframework/security/spring-security-rsa/1.1.2/spring-security-rsa-1.1.2.jar:/Users/jhlee/.m2/repository/org/bouncycastle/bcprov-jdk18on/1.77/bcprov-jdk18on-1.77.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-openfeign-core/4.1.1/spring-cloud-openfeign-core-4.1.1.jar:/Users/jhlee/.m2/repository/io/github/openfeign/form/feign-form-spring/3.8.0/feign-form-spring-3.8.0.jar:/Users/jhlee/.m2/repository/io/github/openfeign/form/feign-form/3.8.0/feign-form-3.8.0.jar:/Users/jhlee/.m2/repository/commons-fileupload/commons-fileupload/1.5/commons-fileupload-1.5.jar:/Users/jhlee/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-commons/4.1.2/spring-cloud-commons-4.1.2.jar:/Users/jhlee/.m2/repository/org/springframework/security/spring-security-crypto/6.2.4/spring-security-crypto-6.2.4.jar:/Users/jhlee/.m2/repository/io/github/openfeign/feign-core/13.2.1/feign-core-13.2.1.jar:/Users/jhlee/.m2/repository/io/github/openfeign/feign-slf4j/13.2.1/feign-slf4j-13.2.1.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.2.5/spring-boot-starter-test-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-test/3.2.5/spring-boot-test-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.2.5/spring-boot-test-autoconfigure-3.2.5.jar:/Users/jhlee/.m2/repository/com/jayway/jsonpath/json-path/2.9.0/json-path-2.9.0.jar:/Users/jhlee/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/Users/jhlee/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar:/Users/jhlee/.m2/repository/net/minidev/json-smart/2.5.1/json-smart-2.5.1.jar:/Users/jhlee/.m2/repository/net/minidev/accessors-smart/2.5.1/accessors-smart-2.5.1.jar:/Users/jhlee/.m2/repository/org/ow2/asm/asm/9.6/asm-9.6.jar:/Users/jhlee/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/Users/jhlee/.m2/repository/net/bytebuddy/byte-buddy/1.14.13/byte-buddy-1.14.13.jar:/Users/jhlee/.m2/repository/org/awaitility/awaitility/4.2.1/awaitility-4.2.1.jar:/Users/jhlee/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/Users/jhlee/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/jhlee/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/jhlee/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/jhlee/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/jhlee/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/jhlee/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/jhlee/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/jhlee/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/Users/jhlee/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/Users/jhlee/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar:/Users/jhlee/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/Users/jhlee/.m2/repository/org/mockito/mockito-junit-jupiter/5.7.0/mockito-junit-jupiter-5.7.0.jar:/Users/jhlee/.m2/repository/org/skyscreamer/jsonassert/1.5.1/jsonassert-1.5.1.jar:/Users/jhlee/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/Users/jhlee/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-test/6.1.6/spring-test-6.1.6.jar:/Users/jhlee/.m2/repository/org/xmlunit/xmlunit-core/2.9.1/xmlunit-core-2.9.1.jar:/Users/jhlee/.m2/repository/org/mockito/mockito-inline/5.2.0/mockito-inline-5.2.0.jar:"/>
+    <property name="java.vm.vendor" value="Microsoft"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://www.microsoft.com"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/Users/jhlee/Library/Java/JavaVirtualMachines/ms-21.0.9/Contents/Home/lib"/>
+    <property name="sun.java.command" value="/Users/jhlee/Desktop/ooad/aftersale-service-system/aftersale/target/surefire/surefirebooter-20251226001817913_6.jar /Users/jhlee/Desktop/ooad/aftersale-service-system/aftersale/target/surefire 2025-12-26T00-18-16_771-jvmRun1 surefire-20251226001817913_4tmp surefire_1-20251226001817913_5tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/Users/jhlee/Desktop/ooad/aftersale-service-system/aftersale/target/test-classes:/Users/jhlee/Desktop/ooad/aftersale-service-system/aftersale/target/classes:/Users/jhlee/Desktop/ooad/aftersale-service-system/core/target/classes:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-actuator/3.2.5/spring-boot-starter-actuator-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-actuator-autoconfigure/3.2.5/spring-boot-actuator-autoconfigure-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-actuator/3.2.5/spring-boot-actuator-3.2.5.jar:/Users/jhlee/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar:/Users/jhlee/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar:/Users/jhlee/.m2/repository/io/micrometer/micrometer-jakarta9/1.12.5/micrometer-jakarta9-1.12.5.jar:/Users/jhlee/.m2/repository/io/micrometer/micrometer-core/1.12.5/micrometer-core-1.12.5.jar:/Users/jhlee/.m2/repository/org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.jar:/Users/jhlee/.m2/repository/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-aop/3.2.5/spring-boot-starter-aop-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar:/Users/jhlee/.m2/repository/org/aspectj/aspectjweaver/1.9.22/aspectjweaver-1.9.22.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-data-redis/3.2.5/spring-boot-starter-data-redis-3.2.5.jar:/Users/jhlee/.m2/repository/io/lettuce/lettuce-core/6.3.2.RELEASE/lettuce-core-6.3.2.RELEASE.jar:/Users/jhlee/.m2/repository/io/netty/netty-common/4.1.109.Final/netty-common-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-handler/4.1.109.Final/netty-handler-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-resolver/4.1.109.Final/netty-resolver-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-buffer/4.1.109.Final/netty-buffer-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-transport-native-unix-common/4.1.109.Final/netty-transport-native-unix-common-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-codec/4.1.109.Final/netty-codec-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/netty/netty-transport/4.1.109.Final/netty-transport-4.1.109.Final.jar:/Users/jhlee/.m2/repository/io/projectreactor/reactor-core/3.6.5/reactor-core-3.6.5.jar:/Users/jhlee/.m2/repository/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar:/Users/jhlee/.m2/repository/org/springframework/data/spring-data-redis/3.2.5/spring-data-redis-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/data/spring-data-keyvalue/3.2.5/spring-data-keyvalue-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/spring-tx/6.1.6/spring-tx-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-oxm/6.1.6/spring-oxm-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-context-support/6.1.6/spring-context-support-6.1.6.jar:/Users/jhlee/.m2/repository/com/auth0/java-jwt/4.4.0/java-jwt-4.4.0.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4.jar:/Users/jhlee/.m2/repository/com/github/pagehelper/pagehelper-spring-boot-starter/2.1.0/pagehelper-spring-boot-starter-2.1.0.jar:/Users/jhlee/.m2/repository/com/github/pagehelper/pagehelper-spring-boot-autoconfigure/2.1.0/pagehelper-spring-boot-autoconfigure-2.1.0.jar:/Users/jhlee/.m2/repository/com/github/pagehelper/pagehelper/6.1.0/pagehelper-6.1.0.jar:/Users/jhlee/.m2/repository/com/github/jsqlparser/jsqlparser/4.7/jsqlparser-4.7.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-starter-loadbalancer/4.1.2/spring-cloud-starter-loadbalancer-4.1.2.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-loadbalancer/4.1.2/spring-cloud-loadbalancer-4.1.2.jar:/Users/jhlee/.m2/repository/io/projectreactor/addons/reactor-extra/3.5.1/reactor-extra-3.5.1.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-cache/3.2.5/spring-boot-starter-cache-3.2.5.jar:/Users/jhlee/.m2/repository/com/stoyanr/evictor/1.0.0/evictor-1.0.0.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/3.2.5/spring-boot-starter-data-jpa-3.2.5.jar:/Users/jhlee/.m2/repository/org/hibernate/orm/hibernate-core/6.4.4.Final/hibernate-core-6.4.4.Final.jar:/Users/jhlee/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/Users/jhlee/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/Users/jhlee/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/Users/jhlee/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/Users/jhlee/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.5/jaxb-runtime-4.0.5.jar:/Users/jhlee/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.5/jaxb-core-4.0.5.jar:/Users/jhlee/.m2/repository/org/eclipse/angus/angus-activation/2.0.2/angus-activation-2.0.2.jar:/Users/jhlee/.m2/repository/org/glassfish/jaxb/txw2/4.0.5/txw2-4.0.5.jar:/Users/jhlee/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/Users/jhlee/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/Users/jhlee/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/Users/jhlee/.m2/repository/org/springframework/data/spring-data-jpa/3.2.5/spring-data-jpa-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/data/spring-data-commons/3.2.5/spring-data-commons-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/spring-orm/6.1.6/spring-orm-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-aspects/6.1.6/spring-aspects-6.1.6.jar:/Users/jhlee/.m2/repository/com/squareup/javapoet/1.13.0/javapoet-1.13.0.jar:/Users/jhlee/.m2/repository/com/google/auto/service/auto-service/1.1.1/auto-service-1.1.1.jar:/Users/jhlee/.m2/repository/com/google/auto/service/auto-service-annotations/1.1.1/auto-service-annotations-1.1.1.jar:/Users/jhlee/.m2/repository/com/google/auto/auto-common/1.2.1/auto-common-1.2.1.jar:/Users/jhlee/.m2/repository/com/google/guava/guava/32.0.1-jre/guava-32.0.1-jre.jar:/Users/jhlee/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/Users/jhlee/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/Users/jhlee/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/Users/jhlee/.m2/repository/org/checkerframework/checker-qual/3.33.0/checker-qual-3.33.0.jar:/Users/jhlee/.m2/repository/com/google/errorprone/error_prone_annotations/2.18.0/error_prone_annotations-2.18.0.jar:/Users/jhlee/.m2/repository/com/google/j2objc/j2objc-annotations/2.8/j2objc-annotations-2.8.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.2.5/spring-boot-starter-web-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter/3.2.5/spring-boot-starter-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.2.5/spring-boot-starter-logging-3.2.5.jar:/Users/jhlee/.m2/repository/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14.jar:/Users/jhlee/.m2/repository/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14.jar:/Users/jhlee/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.21.1/log4j-to-slf4j-2.21.1.jar:/Users/jhlee/.m2/repository/org/apache/logging/log4j/log4j-api/2.21.1/log4j-api-2.21.1.jar:/Users/jhlee/.m2/repository/org/slf4j/jul-to-slf4j/2.0.13/jul-to-slf4j-2.0.13.jar:/Users/jhlee/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/Users/jhlee/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.2.5/spring-boot-starter-json-3.2.5.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.15.4/jackson-datatype-jdk8-2.15.4.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.4/jackson-datatype-jsr310-2.15.4.jar:/Users/jhlee/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.15.4/jackson-module-parameter-names-2.15.4.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.2.5/spring-boot-starter-tomcat-3.2.5.jar:/Users/jhlee/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.20/tomcat-embed-core-10.1.20.jar:/Users/jhlee/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.20/tomcat-embed-websocket-10.1.20.jar:/Users/jhlee/.m2/repository/org/springframework/spring-web/6.1.6/spring-web-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-webmvc/6.1.6/spring-webmvc-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.2.5/spring-boot-starter-validation-3.2.5.jar:/Users/jhlee/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.20/tomcat-embed-el-10.1.20.jar:/Users/jhlee/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.1.Final/hibernate-validator-8.0.1.Final.jar:/Users/jhlee/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/Users/jhlee/.m2/repository/org/jboss/logging/jboss-logging/3.5.3.Final/jboss-logging-3.5.3.Final.jar:/Users/jhlee/.m2/repository/com/fasterxml/classmate/1.6.0/classmate-1.6.0.jar:/Users/jhlee/.m2/repository/org/mybatis/spring/boot/mybatis-spring-boot-starter/3.0.3/mybatis-spring-boot-starter-3.0.3.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.2.5/spring-boot-starter-jdbc-3.2.5.jar:/Users/jhlee/.m2/repository/com/zaxxer/HikariCP/5.0.1/HikariCP-5.0.1.jar:/Users/jhlee/.m2/repository/org/springframework/spring-jdbc/6.1.6/spring-jdbc-6.1.6.jar:/Users/jhlee/.m2/repository/org/mybatis/spring/boot/mybatis-spring-boot-autoconfigure/3.0.3/mybatis-spring-boot-autoconfigure-3.0.3.jar:/Users/jhlee/.m2/repository/org/mybatis/mybatis/3.5.14/mybatis-3.5.14.jar:/Users/jhlee/.m2/repository/org/mybatis/mybatis-spring/3.0.3/mybatis-spring-3.0.3.jar:/Users/jhlee/.m2/repository/com/mysql/mysql-connector-j/9.0.0/mysql-connector-j-9.0.0.jar:/Users/jhlee/.m2/repository/com/google/protobuf/protobuf-java/4.26.1/protobuf-java-4.26.1.jar:/Users/jhlee/.m2/repository/com/alibaba/druid-spring-boot-3-starter/1.2.27/druid-spring-boot-3-starter-1.2.27.jar:/Users/jhlee/.m2/repository/com/alibaba/druid/1.2.27/druid-1.2.27.jar:/Users/jhlee/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar:/Users/jhlee/.m2/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-starter-openfeign/4.1.1/spring-cloud-starter-openfeign-4.1.1.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-starter/4.1.2/spring-cloud-starter-4.1.2.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-context/4.1.2/spring-cloud-context-4.1.2.jar:/Users/jhlee/.m2/repository/org/springframework/security/spring-security-rsa/1.1.2/spring-security-rsa-1.1.2.jar:/Users/jhlee/.m2/repository/org/bouncycastle/bcprov-jdk18on/1.77/bcprov-jdk18on-1.77.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-openfeign-core/4.1.1/spring-cloud-openfeign-core-4.1.1.jar:/Users/jhlee/.m2/repository/io/github/openfeign/form/feign-form-spring/3.8.0/feign-form-spring-3.8.0.jar:/Users/jhlee/.m2/repository/io/github/openfeign/form/feign-form/3.8.0/feign-form-3.8.0.jar:/Users/jhlee/.m2/repository/commons-fileupload/commons-fileupload/1.5/commons-fileupload-1.5.jar:/Users/jhlee/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar:/Users/jhlee/.m2/repository/org/springframework/cloud/spring-cloud-commons/4.1.2/spring-cloud-commons-4.1.2.jar:/Users/jhlee/.m2/repository/org/springframework/security/spring-security-crypto/6.2.4/spring-security-crypto-6.2.4.jar:/Users/jhlee/.m2/repository/io/github/openfeign/feign-core/13.2.1/feign-core-13.2.1.jar:/Users/jhlee/.m2/repository/io/github/openfeign/feign-slf4j/13.2.1/feign-slf4j-13.2.1.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.2.5/spring-boot-starter-test-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-test/3.2.5/spring-boot-test-3.2.5.jar:/Users/jhlee/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.2.5/spring-boot-test-autoconfigure-3.2.5.jar:/Users/jhlee/.m2/repository/com/jayway/jsonpath/json-path/2.9.0/json-path-2.9.0.jar:/Users/jhlee/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/Users/jhlee/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar:/Users/jhlee/.m2/repository/net/minidev/json-smart/2.5.1/json-smart-2.5.1.jar:/Users/jhlee/.m2/repository/net/minidev/accessors-smart/2.5.1/accessors-smart-2.5.1.jar:/Users/jhlee/.m2/repository/org/ow2/asm/asm/9.6/asm-9.6.jar:/Users/jhlee/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/Users/jhlee/.m2/repository/net/bytebuddy/byte-buddy/1.14.13/byte-buddy-1.14.13.jar:/Users/jhlee/.m2/repository/org/awaitility/awaitility/4.2.1/awaitility-4.2.1.jar:/Users/jhlee/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/Users/jhlee/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/jhlee/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/jhlee/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/jhlee/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/jhlee/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/jhlee/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/jhlee/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/jhlee/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/Users/jhlee/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/Users/jhlee/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar:/Users/jhlee/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/Users/jhlee/.m2/repository/org/mockito/mockito-junit-jupiter/5.7.0/mockito-junit-jupiter-5.7.0.jar:/Users/jhlee/.m2/repository/org/skyscreamer/jsonassert/1.5.1/jsonassert-1.5.1.jar:/Users/jhlee/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/Users/jhlee/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar:/Users/jhlee/.m2/repository/org/springframework/spring-test/6.1.6/spring-test-6.1.6.jar:/Users/jhlee/.m2/repository/org/xmlunit/xmlunit-core/2.9.1/xmlunit-core-2.9.1.jar:/Users/jhlee/.m2/repository/org/mockito/mockito-inline/5.2.0/mockito-inline-5.2.0.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/Users/jhlee"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-10-21"/>
+    <property name="java.home" value="/Users/jhlee/Library/Java/JavaVirtualMachines/ms-21.0.9/Contents/Home"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/Users/jhlee/Desktop/ooad/aftersale-service-system/aftersale"/>
+    <property name="style.color" value="always"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="apple.awt.application.name" value="ForkedBooter"/>
+    <property name="surefire.real.class.path" value="/Users/jhlee/Desktop/ooad/aftersale-service-system/aftersale/target/surefire/surefirebooter-20251226001817913_6.jar"/>
+    <property name="user.script" value="Hans"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.9+10-LTS"/>
+    <property name="user.name" value="jhlee"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="26.2"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Microsoft-12574443"/>
+    <property name="maven.ext.class.path" value="/Applications/IntelliJ IDEA.app/Contents/plugins/maven/lib/maven-event-listener.jar"/>
+    <property name="localRepository" value="/Users/jhlee/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/microsoft/openjdk/issues"/>
+    <property name="java.io.tmpdir" value="/var/folders/1j/q375tqjn5_9_b925v1g1c_5r0000gn/T/"/>
+    <property name="idea.version" value="2025.3.1"/>
+    <property name="java.version" value="21.0.9"/>
+    <property name="user.dir" value="/Users/jhlee/Desktop/ooad/aftersale-service-system/aftersale"/>
+    <property name="os.arch" value="aarch64"/>
+    <property name="jansi.passthrough" value="true"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="33360"/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/Users/jhlee/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Microsoft"/>
+    <property name="java.vm.version" value="21.0.9+10-LTS"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="maven.repo.local" value="/Users/jhlee/.m2/repository"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[aftersale-service] "/>
+  </properties>
+  <testcase name="confirmRepair_Approve" classname="cn.edu.xmu.aftersale.controller.AftersaleControllerWebTest$ConfirmAftersaleTests" time="0.733">
+    <system-out><![CDATA[Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7a27b1ca] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.alibaba.druid.pool.DruidStatementConnection@236d77a5] will not be managed by Spring
+==>  Preparing: INSERT INTO aftersales (shop_id, order_id, customer_id, product_id, type, reason, status, express_id, return_express_id, gmt_create, gmt_modified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+==> Parameters: 1(Long), 1002(Long), 1(Long), 1(Long), 2(Integer), 测试(String), 0(Integer), null, null, 2025-12-26T00:18:26.277317(LocalDateTime), 2025-12-26T00:18:26.277339(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7a27b1ca]
+2025-12-26T00:18:26.386+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.dao.AftersaleOrderRepository     : 售后单创建成功: id=1037
+2025-12-26T00:18:26.397+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.controller.AftersaleController   : 商户审核售后API: shopId=1, id=1037, confirm=true
+2025-12-26T00:18:26.448+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.service.AftersaleService         : 开始审核售后单: shopId=1, id=1037, confirm=true
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ee2466e]
+JDBC Connection [com.alibaba.druid.pool.DruidStatementConnection@236d77a5] will be managed by Spring
+==>  Preparing: SELECT * FROM aftersales WHERE id = ? AND shop_id = ?
+==> Parameters: 1037(Long), 1(Long)
+<==    Columns: id, shop_id, order_id, order_item_id, customer_id, product_id, type, reason, status, conclusion, gmt_create, gmt_modified, express_id, return_express_id
+<==        Row: 1037, 1, 1002, null, 1, 1, 2, 测试, 0, null, 2025-12-26 00:18:26, 2025-12-26 00:18:26, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ee2466e]
+2025-12-26T00:18:26.499+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.m.s.impl.RepairConfirmStrategy   : 执行维修审核策略: orderId=1037, confirm=true
+2025-12-26T00:18:26.500+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.m.s.impl.RepairConfirmStrategy   : 维修审核通过: orderId=1037, 状态转换为待完成
+2025-12-26T00:18:26.501+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.m.s.impl.RepairConfirmStrategy   : 维修服务单创建成功: aftersaleId=1037
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ee2466e] from current transaction
+==>  Preparing: UPDATE aftersales SET status = ?, conclusion = ?, express_id = ?, return_express_id = ?, gmt_modified = ? WHERE id = ? AND shop_id = ?
+==> Parameters: 2(Integer), 同意维修(String), null, null, 2025-12-26T00:18:26.500022(LocalDateTime), 1037(Long), 1(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ee2466e]
+2025-12-26T00:18:26.601+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.dao.AftersaleOrderRepository     : 售后单更新成功: id=1037, status=TO_BE_COMPLETED
+2025-12-26T00:18:26.601+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.service.AftersaleService         : 售后单审核完成: id=1037, status=TO_BE_COMPLETED
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ee2466e]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ee2466e]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ee2466e]
+
+MockHttpServletRequest:
+      HTTP Method = PUT
+      Request URI = /shops/1/aftersaleorders/1037/confirm
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Content-Length:"48"]
+             Body = {"confirm": true, "conclusion": "同意维修"}
+
+    Session Attrs = {}
+
+Handler:
+             Type = cn.edu.xmu.aftersale.controller.AftersaleController
+           Method = cn.edu.xmu.aftersale.controller.AftersaleController#confirmAftersale(Long, Long, ConfirmAftersaleRequest)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"errmsg":"ReturnNo.OK","data":{"errno":0,"errmsg":"ReturnNo.OK","status":"TO_BE_COMPLETED"},"errno":0}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+]]></system-out>
+  </testcase>
+  <testcase name="confirmReturn_Approve" classname="cn.edu.xmu.aftersale.controller.AftersaleControllerWebTest$ConfirmAftersaleTests" time="0.739">
+    <system-out><![CDATA[Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@27b4eb29] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.alibaba.druid.pool.DruidStatementConnection@236d77a5] will not be managed by Spring
+==>  Preparing: INSERT INTO aftersales (shop_id, order_id, customer_id, product_id, type, reason, status, express_id, return_express_id, gmt_create, gmt_modified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+==> Parameters: 1(Long), 1001(Long), 1(Long), 1(Long), 1(Integer), 测试(String), 0(Integer), null, null, 2025-12-26T00:18:27.014499(LocalDateTime), 2025-12-26T00:18:27.014522(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@27b4eb29]
+2025-12-26T00:18:27.119+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.dao.AftersaleOrderRepository     : 售后单创建成功: id=1038
+2025-12-26T00:18:27.125+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.controller.AftersaleController   : 商户审核售后API: shopId=1, id=1038, confirm=true
+2025-12-26T00:18:27.176+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.service.AftersaleService         : 开始审核售后单: shopId=1, id=1038, confirm=true
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@66dfa9df]
+JDBC Connection [com.alibaba.druid.pool.DruidStatementConnection@236d77a5] will be managed by Spring
+==>  Preparing: SELECT * FROM aftersales WHERE id = ? AND shop_id = ?
+==> Parameters: 1038(Long), 1(Long)
+<==    Columns: id, shop_id, order_id, order_item_id, customer_id, product_id, type, reason, status, conclusion, gmt_create, gmt_modified, express_id, return_express_id
+<==        Row: 1038, 1, 1001, null, 1, 1, 1, 测试, 0, null, 2025-12-26 00:18:27, 2025-12-26 00:18:27, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@66dfa9df]
+2025-12-26T00:18:27.228+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.m.s.impl.ReturnConfirmStrategy   : 执行退货审核策略: orderId=1038, confirm=true
+2025-12-26T00:18:27.228+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.m.s.impl.ReturnConfirmStrategy   : 退货审核通过: orderId=1038, 状态转换为待验收
+2025-12-26T00:18:27.232+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.m.s.impl.ReturnConfirmStrategy   : 物流运单创建成功: packageId=888, billCode=BILL-888
+2025-12-26T00:18:27.232+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.m.s.impl.ReturnConfirmStrategy   : 退货运单创建成功: aftersaleId=1038, expressId=888
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@66dfa9df] from current transaction
+==>  Preparing: UPDATE aftersales SET status = ?, conclusion = ?, express_id = ?, return_express_id = ?, gmt_modified = ? WHERE id = ? AND shop_id = ?
+==> Parameters: 1(Integer), 同意退货(String), 888(Long), null, 2025-12-26T00:18:27.228335(LocalDateTime), 1038(Long), 1(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@66dfa9df]
+2025-12-26T00:18:27.336+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.dao.AftersaleOrderRepository     : 售后单更新成功: id=1038, status=TO_BE_RECEIVED
+2025-12-26T00:18:27.336+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.service.AftersaleService         : 售后单审核完成: id=1038, status=TO_BE_RECEIVED
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@66dfa9df]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@66dfa9df]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@66dfa9df]
+
+MockHttpServletRequest:
+      HTTP Method = PUT
+      Request URI = /shops/1/aftersaleorders/1038/confirm
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Content-Length:"48"]
+             Body = {"confirm": true, "conclusion": "同意退货"}
+
+    Session Attrs = {}
+
+Handler:
+             Type = cn.edu.xmu.aftersale.controller.AftersaleController
+           Method = cn.edu.xmu.aftersale.controller.AftersaleController#confirmAftersale(Long, Long, ConfirmAftersaleRequest)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"errmsg":"ReturnNo.OK","data":{"errno":0,"errmsg":"ReturnNo.OK","status":"TO_BE_RECEIVED"},"errno":0}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+]]></system-out>
+  </testcase>
+  <testcase name="confirm_Reject" classname="cn.edu.xmu.aftersale.controller.AftersaleControllerWebTest$ConfirmAftersaleTests" time="0.716">
+    <system-out><![CDATA[Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@248651cd] was not registered for synchronization because synchronization is not active
+JDBC Connection [com.alibaba.druid.pool.DruidStatementConnection@236d77a5] will not be managed by Spring
+==>  Preparing: INSERT INTO aftersales (shop_id, order_id, customer_id, product_id, type, reason, status, express_id, return_express_id, gmt_create, gmt_modified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+==> Parameters: 1(Long), 1001(Long), 1(Long), 1(Long), 1(Integer), 测试(String), 0(Integer), null, null, 2025-12-26T00:18:27.755554(LocalDateTime), 2025-12-26T00:18:27.755567(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@248651cd]
+2025-12-26T00:18:27.858+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.dao.AftersaleOrderRepository     : 售后单创建成功: id=1039
+2025-12-26T00:18:27.863+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.controller.AftersaleController   : 商户审核售后API: shopId=1, id=1039, confirm=false
+2025-12-26T00:18:27.914+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.service.AftersaleService         : 开始审核售后单: shopId=1, id=1039, confirm=false
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@609d3378]
+JDBC Connection [com.alibaba.druid.pool.DruidStatementConnection@236d77a5] will be managed by Spring
+==>  Preparing: SELECT * FROM aftersales WHERE id = ? AND shop_id = ?
+==> Parameters: 1039(Long), 1(Long)
+<==    Columns: id, shop_id, order_id, order_item_id, customer_id, product_id, type, reason, status, conclusion, gmt_create, gmt_modified, express_id, return_express_id
+<==        Row: 1039, 1, 1001, null, 1, 1, 1, 测试, 0, null, 2025-12-26 00:18:28, 2025-12-26 00:18:28, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@609d3378]
+2025-12-26T00:18:27.964+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.m.s.impl.ReturnConfirmStrategy   : 执行退货审核策略: orderId=1039, confirm=false
+2025-12-26T00:18:27.964+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.m.s.impl.ReturnConfirmStrategy   : 退货审核拒绝: orderId=1039, reason=不符合条件
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@609d3378] from current transaction
+==>  Preparing: UPDATE aftersales SET status = ?, conclusion = ?, express_id = ?, return_express_id = ?, gmt_modified = ? WHERE id = ? AND shop_id = ?
+==> Parameters: 4(Integer), 不符合条件(String), null, null, 2025-12-26T00:18:27.964630(LocalDateTime), 1039(Long), 1(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@609d3378]
+2025-12-26T00:18:28.064+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.dao.AftersaleOrderRepository     : 售后单更新成功: id=1039, status=REJECTED
+2025-12-26T00:18:28.064+08:00  INFO 33360 --- [aftersale-service] [           main] c.e.x.a.service.AftersaleService         : 售后单审核完成: id=1039, status=REJECTED
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@609d3378]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@609d3378]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@609d3378]
+
+MockHttpServletRequest:
+      HTTP Method = PUT
+      Request URI = /shops/1/aftersaleorders/1039/confirm
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Content-Length:"52"]
+             Body = {"confirm": false, "conclusion": "不符合条件"}
+
+    Session Attrs = {}
+
+Handler:
+             Type = cn.edu.xmu.aftersale.controller.AftersaleController
+           Method = cn.edu.xmu.aftersale.controller.AftersaleController#confirmAftersale(Long, Long, ConfirmAftersaleRequest)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"errmsg":"ReturnNo.OK","data":{"errno":0,"errmsg":"ReturnNo.OK","status":"REJECTED"},"errno":0}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+]]></system-out>
+  </testcase>
+</testsuite>
