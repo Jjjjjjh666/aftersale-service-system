@@ -1,6 +1,8 @@
 package cn.edu.xmu.service.controller;
 
-import cn.edu.xmu.common.model.ReturnObject;
+import cn.edu.xmu.javaee.core.model.ReturnObject;
+import cn.edu.xmu.service.controller.dto.AssignServiceOrderRequest;
+import cn.edu.xmu.service.controller.dto.ConfirmServiceOrderRequest;
 import cn.edu.xmu.service.service.ServiceOrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,18 +27,48 @@ class ServiceProviderOrderControllerTest {
     }
 
     @Test
-    void acceptServiceOrderShouldInvokeService() {
-        ReturnObject result = controller.acceptServiceOrder(3L, 8L);
+    void confirmEndpointShouldDelegateToService() {
+        ConfirmServiceOrderRequest request = new ConfirmServiceOrderRequest();
+        request.setConfirm(Boolean.TRUE);
 
-        verify(serviceOrderService).acceptServiceOrder(3L, 8L);
+        ReturnObject result = controller.confirmServiceOrder(3L, 9L, request);
+
+        verify(serviceOrderService).confirmServiceOrder(3L, 9L, true);
         assertEquals(0, result.getErrno());
     }
 
     @Test
-    void cancelServiceOrderShouldInvokeService() {
-        ReturnObject result = controller.cancelServiceOrder(5L, 11L);
+    void assignEndpointShouldPassPayload() {
+        AssignServiceOrderRequest request = new AssignServiceOrderRequest();
+        request.setServiceStaffId(66L);
 
-        verify(serviceOrderService).cancelServiceOrder(5L, 11L);
+        ReturnObject result = controller.assignServiceOrder(1L, 2L, request);
+
+        verify(serviceOrderService).assignServiceOrder(1L, 2L, 66L);
+        assertEquals(0, result.getErrno());
+    }
+
+    @Test
+    void receiveEndpointShouldDelegate() {
+        ReturnObject result = controller.receiveServiceOrder(1L, 5L);
+
+        verify(serviceOrderService).receiveServiceOrder(1L, 5L);
+        assertEquals(0, result.getErrno());
+    }
+
+    @Test
+    void completeEndpointShouldDelegate() {
+        ReturnObject result = controller.completeServiceOrder(8L, 18L);
+
+        verify(serviceOrderService).completeServiceOrder(8L, 18L);
+        assertEquals(0, result.getErrno());
+    }
+
+    @Test
+    void cancelEndpointShouldDelegate() {
+        ReturnObject result = controller.cancelServiceOrder(9L, 19L);
+
+        verify(serviceOrderService).cancelServiceOrder(9L, 19L);
         assertEquals(0, result.getErrno());
     }
 }

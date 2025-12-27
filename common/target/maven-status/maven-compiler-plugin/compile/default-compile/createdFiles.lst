@@ -1,5 +1,0 @@
-cn/edu/xmu/common/model/ReturnNo.class
-cn/edu/xmu/common/util/JacksonUtil.class
-cn/edu/xmu/common/exception/GlobalExceptionHandler.class
-cn/edu/xmu/common/model/ReturnObject.class
-cn/edu/xmu/common/exception/BusinessException.class

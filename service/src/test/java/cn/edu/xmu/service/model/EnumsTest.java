@@ -2,8 +2,7 @@ package cn.edu.xmu.service.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class EnumsTest {
 
@@ -15,8 +14,15 @@ class EnumsTest {
 
     @Test
     void serviceOrderStatusOfShouldReturnEnum() {
-        assertEquals(ServiceOrderStatus.CREATED, ServiceOrderStatus.of("CREATED"));
+        assertEquals(ServiceOrderStatus.PENDING, ServiceOrderStatus.of("PENDING"));
         assertThrows(IllegalArgumentException.class, () -> ServiceOrderStatus.of("invalid"));
+    }
+
+    @Test
+    void serviceOrderStatusHelpersShouldReflectTransitions() {
+        assertTrue(ServiceOrderStatus.CANCELED.isTerminal());
+        assertTrue(ServiceOrderStatus.TO_BE_ASSIGNED.canCancel());
+        assertFalse(ServiceOrderStatus.COMPLETED.canCancel());
     }
 
     @Test

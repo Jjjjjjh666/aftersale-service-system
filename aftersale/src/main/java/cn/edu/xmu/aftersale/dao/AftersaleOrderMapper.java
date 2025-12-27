@@ -24,6 +24,8 @@ public interface AftersaleOrderMapper {
             @Result(property = "status", column = "status"),
             @Result(property = "reason", column = "reason"),
             @Result(property = "conclusion", column = "conclusion"),
+            @Result(property = "expressId", column = "express_id"),
+            @Result(property = "returnExpressId", column = "return_express_id"),
             @Result(property = "gmtCreate", column = "gmt_create"),
             @Result(property = "gmtModified", column = "gmt_modified")
     })
@@ -32,15 +34,15 @@ public interface AftersaleOrderMapper {
     /**
      * 更新售后单状态
      */
-    @Update("UPDATE aftersales SET status = #{status}, conclusion = #{conclusion}, " +
-            "gmt_modified = #{gmtModified} WHERE id = #{id} AND shop_id = #{shopId}")
+    @Update("UPDATE aftersales SET status = #{status}, conclusion = #{conclusion}, express_id = #{expressId}, " +
+            "return_express_id = #{returnExpressId}, gmt_modified = #{gmtModified} WHERE id = #{id} AND shop_id = #{shopId}")
     int updateStatus(AftersaleOrderPo po);
 
     /**
      * 插入售后单（用于测试）
      */
-    @Insert("INSERT INTO aftersales (shop_id, order_id, customer_id, product_id, type, reason, status, gmt_create, gmt_modified) " +
-            "VALUES (#{shopId}, #{orderId}, #{customerId}, #{productId}, #{type}, #{reason}, #{status}, #{gmtCreate}, #{gmtModified})")
+    @Insert("INSERT INTO aftersales (shop_id, order_id, customer_id, product_id, type, reason, status, express_id, return_express_id, gmt_create, gmt_modified) " +
+            "VALUES (#{shopId}, #{orderId}, #{customerId}, #{productId}, #{type}, #{reason}, #{status}, #{expressId}, #{returnExpressId}, #{gmtCreate}, #{gmtModified})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(AftersaleOrderPo po);
 }

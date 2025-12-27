@@ -1,0 +1,371 @@
+### ============================================
+### 服务单API测试用例
+### 端口：8082
+### ============================================
+
+### ============================================
+### 1. 内部接口 - 创建服务单（上门维修）
+### ============================================
+POST http://localhost:8082/internal/shops/1/aftersales/1/serviceorders
+Content-Type: application/json
+
+{
+  "type": 0,
+  "consignee": {
+    "name": "LJH",
+    "mobile": "13800138000"
+  }
+}
+
+### ============================================
+### 2. 内部接口 - 创建服务单（寄修）
+### ============================================
+POST http://localhost:8082/internal/shops/1/aftersales/2/serviceorders
+Content-Type: application/json
+
+{
+  "type": 1,
+  "consignee": {
+    "name": "李四",
+    "mobile": "13900139000"
+  }
+}
+
+### ============================================
+### 3. 服务商审核服务单（通过）- 上门维修
+### 状态流转：PENDING -> TO_BE_ASSIGNED
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/1/confirm
+Content-Type: application/json
+
+{
+  "confirm": false
+}
+
+### ============================================
+### 4. 服务商审核服务单（通过）- 寄修
+### 状态流转：PENDING -> TO_BE_ASSIGNED
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/2/confirm
+Content-Type: application/json
+
+{
+  "confirm": true
+}
+
+### ============================================
+### 5. 服务商审核服务单（拒绝）
+### 状态流转：PENDING -> REJECTED（终态）
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/3/confirm
+Content-Type: application/json
+
+{
+  "confirm": false
+}
+
+### ============================================
+### 6. 服务商派工 - 上门维修
+### 状态流转：TO_BE_ASSIGNED -> ASSIGNED
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/2/assign
+Content-Type: application/json
+
+{
+  "serviceStaffId": 101
+}
+
+### ============================================
+### 7. 服务商派工 - 寄修
+### 状态流转：TO_BE_ASSIGNED -> ASSIGNED
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/7/assign
+Content-Type: application/json
+
+{
+  "serviceStaffId": 102
+}
+
+### ============================================
+### 8. 验收寄修商品
+### 状态流转：ASSIGNED -> RECEIVED（仅寄修类型）
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/7/receive
+
+### ============================================
+### 9. 完成服务单 - 上门维修
+### 状态流转：ASSIGNED -> COMPLETED（终态）
+### 条件：type=0且status=2
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/3/complete
+
+### ============================================
+### 10. 完成服务单 - 寄修
+### 状态流转：RECEIVED -> COMPLETED（终态）
+### 条件：type=1且status=3
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/7/complete
+
+### ============================================
+### 11. 服务商取消服务单 - 待派工状态
+### 状态流转：TO_BE_ASSIGNED -> CANCELED（终态）
+### ============================================
+DELETE http://localhost:8082/serviceprovider/1/serviceorders/4/cancel
+
+### ============================================
+### 12. 服务商取消服务单 - 已派工状态（上门维修）
+### 状态流转：ASSIGNED -> CANCELED（终态）
+### ============================================
+DELETE http://localhost:8082/serviceprovider/1/serviceorders/8/cancel
+
+### ============================================
+### 13. 服务商取消服务单 - 已收件状态（寄修）
+### 状态流转：RECEIVED -> CANCELED（终态）
+### ============================================
+DELETE http://localhost:8082/serviceprovider/1/serviceorders/6/cancel
+
+### ============================================
+### 14. 内部接口 - 取消服务单
+### ============================================
+DELETE http://localhost:8082/internal/shops/1/aftersales/1/serviceorders/cancel?reason=客户取消维修
+
+### ============================================
+### 错误场景测试
+### ============================================
+
+### ============================================
+### 15. 测试状态校验 - 只有待接收状态才能审核
+### 预期：返回状态错误
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/1/confirm
+Content-Type: application/json
+
+{
+  "confirm": true
+}
+
+### ============================================
+### 16. 测试状态校验 - 只有待派工状态才能派工
+### 预期：返回状态错误
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/3/assign
+Content-Type: application/json
+
+{
+  "serviceStaffId": 101
+}
+
+### ============================================
+### 17. 测试状态校验 - 只有已派工状态才能验收收件
+### 预期：返回状态错误
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/1/receive
+
+### ============================================
+### 18. 测试类型校验 - 只有寄修类型才能验收收件
+### 预期：返回类型错误
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/1/receive
+
+### ============================================
+### 19. 测试完成服务单 - 上门维修必须在已派工状态
+### 预期：返回状态错误
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/4/complete
+
+### ============================================
+### 20. 测试完成服务单 - 寄修必须在已收件状态
+### 预期：返回状态错误
+### ============================================
+PUT http://localhost:8082/serviceprovider/1/serviceorders/2/complete
+
+### ============================================
+### 21. 测试取消服务单 - 只有待派工/已派工/已收件状态才能取消
+### 预期：返回状态错误
+### ============================================
+DELETE http://localhost:8082/serviceprovider/1/serviceorders/1/cancel
+
+### ============================================
+### 22. 测试取消服务单 - 终态不能取消
+### 预期：返回状态错误
+### ============================================
+DELETE http://localhost:8082/serviceprovider/1/serviceorders/3/cancel
+
+### ============================================
+### 完整流程测试
+### ============================================
+
+### ============================================
+### 23. 完整流程 - 上门维修
+### 创建 -> 审核通过 -> 派工 -> 完成
+### ============================================
+
+### 23.1 创建服务单
+POST http://localhost:8082/internal/shops/1/aftersales/10/serviceorders
+Content-Type: application/json
+
+{
+  "type": 0,
+  "consignee": {
+    "name": "王五",
+    "mobile": "13700137000"
+  }
+}
+
+### 23.2 审核通过
+PUT http://localhost:8082/serviceprovider/1/serviceorders/10/confirm
+Content-Type: application/json
+
+{
+  "confirm": true
+}
+
+### 23.3 派工
+PUT http://localhost:8082/serviceprovider/1/serviceorders/10/assign
+Content-Type: application/json
+
+{
+  "serviceStaffId": 201
+}
+
+### 23.4 完成服务单
+PUT http://localhost:8082/serviceprovider/1/serviceorders/10/complete
+
+### ============================================
+### 24. 完整流程 - 寄修
+### 创建 -> 审核通过 -> 派工 -> 验收收件 -> 完成
+### ============================================
+
+### 24.1 创建服务单
+POST http://localhost:8082/internal/shops/1/aftersales/11/serviceorders
+Content-Type: application/json
+
+{
+  "type": 1,
+  "consignee": {
+    "name": "赵六",
+    "mobile": "13600136000"
+  }
+}
+
+### 24.2 审核通过
+PUT http://localhost:8082/serviceprovider/1/serviceorders/11/confirm
+Content-Type: application/json
+
+{
+  "confirm": true
+}
+
+### 24.3 派工
+PUT http://localhost:8082/serviceprovider/1/serviceorders/11/assign
+Content-Type: application/json
+
+{
+  "serviceStaffId": 202
+}
+
+### 24.4 验收收件
+PUT http://localhost:8082/serviceprovider/1/serviceorders/11/receive
+
+### 24.5 完成服务单
+PUT http://localhost:8082/serviceprovider/1/serviceorders/2/complete
+
+### ============================================
+### 25. 完整流程 - 审核拒绝
+### 创建 -> 审核拒绝（终态）
+### ============================================
+
+### 25.1 创建服务单
+POST http://localhost:8082/internal/shops/1/aftersales/12/serviceorders
+Content-Type: application/json
+
+{
+  "type": 0,
+  "consignee": {
+    "name": "孙七",
+    "mobile": "13500135000"
+  }
+}
+
+### 25.2 审核拒绝
+PUT http://localhost:8082/serviceprovider/1/serviceorders/12/confirm
+Content-Type: application/json
+
+{
+  "confirm": false
+}
+
+### ============================================
+### 26. 完整流程 - 取消流程
+### 创建 -> 审核通过 -> 派工 -> 取消
+### ============================================
+
+### 26.1 创建服务单
+POST http://localhost:8082/internal/shops/1/aftersales/13/serviceorders
+Content-Type: application/json
+
+{
+  "type": 0,
+  "consignee": {
+    "name": "周八",
+    "mobile": "13400134000"
+  }
+}
+
+### 26.2 审核通过
+PUT http://localhost:8082/serviceprovider/1/serviceorders/13/confirm
+Content-Type: application/json
+
+{
+  "confirm": true
+}
+
+### 26.3 派工
+PUT http://localhost:8082/serviceprovider/1/serviceorders/13/assign
+Content-Type: application/json
+
+{
+  "serviceStaffId": 203
+}
+
+### 26.4 取消服务单
+DELETE http://localhost:8082/serviceprovider/1/serviceorders/6/cancel
+
+### ============================================
+### 27. 完整流程 - 寄修取消（已收件状态）
+### 创建 -> 审核通过 -> 派工 -> 验收收件 -> 取消
+### ============================================
+
+### 27.1 创建服务单
+POST http://localhost:8082/internal/shops/1/aftersales/14/serviceorders
+Content-Type: application/json
+
+{
+  "type": 1,
+  "consignee": {
+    "name": "吴九",
+    "mobile": "13300133000"
+  }
+}
+
+### 27.2 审核通过
+PUT http://localhost:8082/serviceprovider/1/serviceorders/14/confirm
+Content-Type: application/json
+
+{
+  "confirm": true
+}
+
+### 27.3 派工
+PUT http://localhost:8082/serviceprovider/1/serviceorders/14/assign
+Content-Type: application/json
+
+{
+  "serviceStaffId": 204
+}
+
+### 27.4 验收收件
+PUT http://localhost:8082/serviceprovider/1/serviceorders/14/receive
+
+### 27.5 取消服务单
+DELETE http://localhost:8082/serviceprovider/1/serviceorders/14/cancel

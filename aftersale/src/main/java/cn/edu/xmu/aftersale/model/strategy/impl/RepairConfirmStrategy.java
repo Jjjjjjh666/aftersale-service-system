@@ -25,14 +25,23 @@ public class RepairConfirmStrategy implements AftersaleConfirmStrategy {
         log.info("执行维修审核策略: orderId={}, confirm={}", order.getId(), confirm);
         
         if (Boolean.TRUE.equals(confirm)) {
-            // 同意维修
-            order.approve(conclusion != null ? conclusion : "同意维修");
-            log.info("维修审核通过: orderId={}, 准备创建服务单", order.getId());
+            // 审核通过（维修），转换为待完成状态
+            order.approveToBeCompleted(conclusion != null ? conclusion : "同意维修");
+            log.info("维修审核通过: orderId={}, 状态转换为待完成", order.getId());
             
             // 调用服务模块创建服务单（跨模块调用）
             try {
                 CreateServiceOrderRequest request = new CreateServiceOrderRequest();
-                request.setType(2); // 维修类型
+                // 服务单类型：0-上门服务，1-寄件服务（默认使用上门服务）
+                request.setType(0);
+                // 设置联系人信息（如果后续需要从订单获取客户信息，可以在这里优化）
+                CreateServiceOrderRequest.ConsigneeInfo consignee = new CreateServiceOrderRequest.ConsigneeInfo();
+                consignee.setName("客户"); // 默认名称，实际应该从订单获取
+                consignee.setMobile("13800138000"); // 默认手机号，实际应该从订单获取
+                request.setConsignee(consignee);
+                // 设置地址信息（如果后续需要从订单获取地址信息，可以在这里优化）
+                request.setAddress("待填写地址"); // 默认地址，实际应该从订单获取
+                
                 serviceClient.createServiceOrder(order.getShopId(), order.getId(), request);
                 log.info("维修服务单创建成功: aftersaleId={}", order.getId());
             } catch (Exception e) {
@@ -40,8 +49,8 @@ public class RepairConfirmStrategy implements AftersaleConfirmStrategy {
                 throw new RuntimeException("创建服务单失败: " + e.getMessage(), e);
             }
         } else {
-            // 拒绝维修
-            order.approve(conclusion != null ? conclusion : "拒绝维修");
+            // 审核不通过，转换为已拒绝状态
+            order.reject(conclusion != null ? conclusion : "拒绝维修");
             log.info("维修审核拒绝: orderId={}, reason={}", order.getId(), conclusion);
         }
     }

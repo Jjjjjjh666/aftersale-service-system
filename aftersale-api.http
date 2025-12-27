@@ -22,11 +22,11 @@ Content-Type: application/json
 
 {
   "confirm": true,
-  "conclusion": "同意维修"
+  "conclusion": "同意维修，已创建服务单"
 }
 
 ### 4. 商户审核售后（拒绝）
-PUT http://localhost:8081/shops/1/aftersaleorders/1/confirm
+PUT http://localhost:8081/shops/1/aftersaleorders/3/confirm
 Content-Type: application/json
 
 {
@@ -35,7 +35,7 @@ Content-Type: application/json
 }
 
 ### 5. 商户取消售后（退货）
-DELETE http://localhost:8081/shops/1/aftersaleorders/4/cancel
+DELETE http://localhost:8081/shops/1/aftersaleorders/2/cancel
 Content-Type: application/json
 
 {
@@ -44,7 +44,7 @@ Content-Type: application/json
 }
 
 ### 6. 商户取消售后（换货）
-DELETE http://localhost:8081/shops/1/aftersaleorders/5/cancel
+DELETE http://localhost:8081/shops/1/aftersaleorders/1/cancel
 Content-Type: application/json
 
 {
@@ -53,12 +53,12 @@ Content-Type: application/json
 }
 
 ### 7. 商户取消售后（维修）- 会同时取消服务单
-DELETE http://localhost:8081/shops/1/aftersaleorders/6/cancel
+DELETE http://localhost:8081/shops/1/aftersaleorders/3/cancel
 Content-Type: application/json
 
 {
   "confirm": true,
-  "reason": "维修服务商无法提供服务"
+  "reason": "维修服务商无法提供服务，已取消对应服务单"
 }
 
 ### 8. 测试状态校验 - 只有待审核状态才能审核

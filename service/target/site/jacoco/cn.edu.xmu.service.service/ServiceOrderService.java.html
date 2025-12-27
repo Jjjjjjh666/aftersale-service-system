@@ -4,8 +4,9 @@ import cn.edu.xmu.service.dao.ServiceOrderRepository;
 import cn.edu.xmu.service.model.ServiceOrder;
 import cn.edu.xmu.service.model.ServiceOrderStatus;
 import cn.edu.xmu.service.model.ServiceOrderType;
-import cn.edu.xmu.service.model.strategy.ServiceOrderAcceptStrategy;
+import cn.edu.xmu.service.model.strategy.ServiceOrderAssignStrategy;
 import cn.edu.xmu.service.model.strategy.ServiceOrderCancelStrategy;
+import cn.edu.xmu.service.model.strategy.ServiceOrderCompleteStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,103 +18,233 @@ import java.util.List;
 /**
  * 服务单服务
  */
-<span class="fc" id="L20">@Slf4j</span>
+<span class="fc" id="L21">@Slf4j</span>
 @Service
 @RequiredArgsConstructor
 public class ServiceOrderService {
 
     private final ServiceOrderRepository repository;
-    private final List&lt;ServiceOrderAcceptStrategy&gt; acceptStrategies;
+    private final List&lt;ServiceOrderAssignStrategy&gt; assignStrategies;
     private final List&lt;ServiceOrderCancelStrategy&gt; cancelStrategies;
+    private final List&lt;ServiceOrderCompleteStrategy&gt; completeStrategies;
 
     /**
      * 创建服务单（被aftersale模块调用）
      */
     @Transactional
-    public Long createServiceOrder(Long shopId, Long aftersalesId, Integer type, String consignee) {
-<span class="fc" id="L34">        log.info(&quot;创建服务单: shopId={}, aftersalesId={}, type={}&quot;, shopId, aftersalesId, type);</span>
+    public Long createServiceOrder(Long shopId, Long aftersalesId, Integer type, 
+                                    String consignee, String address, String mobile) {
+<span class="fc" id="L37">        log.info(&quot;创建服务单: shopId={}, aftersalesId={}, type={}, consignee={}, address={}, mobile={}&quot;, </span>
+                shopId, aftersalesId, type, consignee, address, mobile);
         
-<span class="fc" id="L36">        ServiceOrder order = ServiceOrder.builder()</span>
-<span class="fc" id="L37">                .shopId(shopId)</span>
-<span class="fc" id="L38">                .aftersalesId(aftersalesId)</span>
-<span class="pc bpc" id="L39" title="1 of 2 branches missed.">                .type(ServiceOrderType.valueOf(type != null ? type : 0))</span>
-<span class="fc" id="L40">                .status(ServiceOrderStatus.CREATED)</span>
-<span class="fc" id="L41">                .consignee(consignee)</span>
-<span class="fc" id="L42">                .createdAt(LocalDateTime.now())</span>
-<span class="fc" id="L43">                .updatedAt(LocalDateTime.now())</span>
-<span class="fc" id="L44">                .build();</span>
+        // 设置默认值，确保必填字段不为空
+<span class="pc bpc" id="L41" title="1 of 4 branches missed.">        String finalConsignee = (consignee != null &amp;&amp; !consignee.isEmpty()) ? consignee : &quot;客户&quot;;</span>
+<span class="pc bpc" id="L42" title="1 of 4 branches missed.">        String finalAddress = (address != null &amp;&amp; !address.isEmpty()) ? address : &quot;待填写地址&quot;;</span>
+<span class="pc bpc" id="L43" title="1 of 4 branches missed.">        String finalMobile = (mobile != null &amp;&amp; !mobile.isEmpty()) ? mobile : &quot;待填写电话&quot;;</span>
         
-<span class="fc" id="L46">        repository.create(order);</span>
+<span class="fc" id="L45">        ServiceOrder order = ServiceOrder.builder()</span>
+<span class="fc" id="L46">                .aftersaleId(aftersalesId)</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">                .type(type != null ? type : 0)</span>
+<span class="fc" id="L48">                .status(ServiceOrderStatus.PENDING)</span>
+<span class="fc" id="L49">                .consignee(finalConsignee)</span>
+<span class="fc" id="L50">                .address(finalAddress)</span>
+<span class="fc" id="L51">                .mobile(finalMobile)</span>
+<span class="fc" id="L52">                .customerId(0L) // 默认值，实际应该从售后单获取</span>
+<span class="fc" id="L53">                .regionId(0L)  // 默认值，实际应该从订单获取</span>
+<span class="fc" id="L54">                .productId(0L) // 默认值，实际应该从售后单获取</span>
+<span class="fc" id="L55">                .createdAt(LocalDateTime.now())</span>
+<span class="fc" id="L56">                .updatedAt(LocalDateTime.now())</span>
+<span class="fc" id="L57">                .build();</span>
         
-<span class="fc" id="L48">        log.info(&quot;服务单创建成功: id={}&quot;, order.getId());</span>
-<span class="fc" id="L49">        return order.getId();</span>
+<span class="fc" id="L59">        repository.create(order);</span>
+        
+<span class="fc" id="L61">        log.info(&quot;服务单创建成功: id={}&quot;, order.getId());</span>
+<span class="fc" id="L62">        return order.getId();</span>
     }
 
     /**
-     * 服务商接受服务单（多态实现）
+     * 服务商审核服务单
+     * 审核通过 → TO_BE_ASSIGNED
+     * 审核不通过 → REJECTED
      */
     @Transactional
-    public void acceptServiceOrder(Long serviceProviderId, Long orderId) {
-<span class="fc" id="L57">        log.info(&quot;开始接受服务单: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
+    public void confirmServiceOrder(Long serviceProviderId, Long orderId, Boolean confirm) {
+<span class="fc" id="L72">        log.info(&quot;开始审核服务单: serviceProviderId={}, orderId={}, confirm={}&quot;, serviceProviderId, orderId, confirm);</span>
         
         // 1. 查询服务单
-<span class="fc" id="L60">        ServiceOrder order = repository.findById(orderId);</span>
+<span class="fc" id="L75">        ServiceOrder order = repository.findById(orderId);</span>
         
         // 2. 检查状态
-<span class="fc" id="L63">        order.checkCreatedStatus();</span>
+<span class="fc" id="L78">        order.checkPendingStatus();</span>
         
-        // 3. 根据类型选择策略（多态）
-<span class="fc" id="L66">        ServiceOrderAcceptStrategy strategy = acceptStrategies.stream()</span>
-<span class="fc" id="L67">                .filter(s -&gt; s.support(order.getType().getCode()))</span>
-<span class="fc" id="L68">                .findFirst()</span>
-<span class="pc" id="L69">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的服务类型: &quot; + order.getType()));</span>
+        // 3. 根据审核结果更新状态
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (Boolean.TRUE.equals(confirm)) {</span>
+            // 审核通过，转换为待派工状态
+<span class="fc" id="L83">            order.approve(serviceProviderId);</span>
+<span class="fc" id="L84">            log.info(&quot;服务单审核通过: orderId={}, 状态转换为待派工&quot;, orderId);</span>
+        } else {
+            // 审核不通过，转换为已拒绝状态
+<span class="fc" id="L87">            order.reject();</span>
+<span class="fc" id="L88">            log.info(&quot;服务单审核不通过: orderId={}, 状态转换为已拒绝&quot;, orderId);</span>
+        }
         
-        // 4. 执行策略
-<span class="fc" id="L72">        strategy.accept(order, serviceProviderId);</span>
+        // 4. 保存更新
+<span class="fc" id="L92">        repository.save(order);</span>
+        
+<span class="fc" id="L94">        log.info(&quot;服务单审核完成: orderId={}, status={}&quot;, orderId, order.getStatus());</span>
+<span class="fc" id="L95">    }</span>
+
+    /**
+     * 服务商派工（使用策略模式）
+     * TO_BE_ASSIGNED → ASSIGNED
+     * 寄修类型会生成运单
+     */
+    @Transactional
+    public void assignServiceOrder(Long serviceProviderId, Long orderId, Long serviceStaffId) {
+<span class="fc" id="L104">        log.info(&quot;开始派工: serviceProviderId={}, orderId={}, serviceStaffId={}&quot;, </span>
+                serviceProviderId, orderId, serviceStaffId);
+        
+        // 1. 查询服务单
+<span class="fc" id="L108">        ServiceOrder order = repository.findById(orderId);</span>
+        
+        // 2. 检查状态
+<span class="fc" id="L111">        order.checkToBeAssignedStatus();</span>
+        
+        // 3. 根据类型选择派工策略（多态）
+<span class="fc" id="L114">        ServiceOrderAssignStrategy strategy = assignStrategies.stream()</span>
+<span class="fc" id="L115">                .filter(s -&gt; s.support(order.getType()))</span>
+<span class="fc" id="L116">                .findFirst()</span>
+<span class="fc" id="L117">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的服务类型: &quot; + order.getType()));</span>
+        
+        // 4. 执行派工策略
+<span class="fc" id="L120">        strategy.assign(order, serviceStaffId);</span>
         
         // 5. 保存更新
-<span class="fc" id="L75">        repository.save(order);</span>
+<span class="fc" id="L123">        repository.save(order);</span>
         
-<span class="fc" id="L77">        log.info(&quot;服务单接受完成: orderId={}, status={}&quot;, orderId, order.getStatus());</span>
-<span class="fc" id="L78">    }</span>
+<span class="fc" id="L125">        log.info(&quot;服务单派工完成: orderId={}, serviceStaffId={}, status={}, expressId={}&quot;, </span>
+<span class="fc" id="L126">                orderId, serviceStaffId, order.getStatus(), order.getExpressId());</span>
+<span class="fc" id="L127">    }</span>
+
+    /**
+     * 验收寄修商品
+     * ASSIGNED → RECEIVED（仅type=1）
+     */
+    @Transactional
+    public void receiveServiceOrder(Long serviceProviderId, Long orderId) {
+<span class="fc" id="L135">        log.info(&quot;开始验收寄修商品: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
+        
+        // 1. 查询服务单
+<span class="fc" id="L138">        ServiceOrder order = repository.findById(orderId);</span>
+        
+        // 2. 检查类型（只有寄修才能验收收件）
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        if (!ServiceOrderType.MAIL_IN_REPAIR.getCode().equals(order.getType())) {</span>
+<span class="fc" id="L142">            throw new IllegalArgumentException(&quot;只有寄修类型的服务单才能验收收件&quot;);</span>
+        }
+        
+        // 3. 检查状态
+<span class="fc" id="L146">        order.checkAssignedStatus();</span>
+        
+        // 4. 验收收件
+<span class="fc" id="L149">        order.receive();</span>
+        
+        // 5. 保存更新
+<span class="fc" id="L152">        repository.save(order);</span>
+        
+<span class="fc" id="L154">        log.info(&quot;寄修商品验收完成: orderId={}, status={}&quot;, orderId, order.getStatus());</span>
+<span class="fc" id="L155">    }</span>
+
+    /**
+     * 完成服务单（使用策略模式）
+     * type=0且status=2 → COMPLETED
+     * type=1且status=3 → COMPLETED
+     */
+    @Transactional
+    public void completeServiceOrder(Long serviceProviderId, Long orderId) {
+<span class="fc" id="L164">        log.info(&quot;开始完成服务单: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
+        
+        // 1. 查询服务单
+<span class="fc" id="L167">        ServiceOrder order = repository.findById(orderId);</span>
+        
+        // 2. 根据类型和状态选择策略（多态）
+<span class="fc" id="L170">        ServiceOrderCompleteStrategy strategy = completeStrategies.stream()</span>
+<span class="fc" id="L171">                .filter(s -&gt; s.support(order.getType(), order.getStatus().ordinal()))</span>
+<span class="fc" id="L172">                .findFirst()</span>
+<span class="fc" id="L173">                .orElseThrow(() -&gt; new IllegalArgumentException(</span>
+<span class="fc" id="L174">                        &quot;当前状态和类型不支持完成操作: type=&quot; + order.getType() + &quot;, status=&quot; + order.getStatus()));</span>
+        
+        // 3. 执行策略
+<span class="fc" id="L177">        strategy.complete(order);</span>
+        
+        // 4. 保存更新
+<span class="fc" id="L180">        repository.save(order);</span>
+        
+<span class="fc" id="L182">        log.info(&quot;服务单完成: orderId={}, status={}&quot;, orderId, order.getStatus());</span>
+<span class="fc" id="L183">    }</span>
 
     /**
      * 服务商取消服务单（多态实现）
      */
     @Transactional
     public void cancelServiceOrder(Long serviceProviderId, Long orderId) {
-<span class="fc" id="L85">        log.info(&quot;开始取消服务单: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
+<span class="fc" id="L190">        log.info(&quot;开始取消服务单: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
         
         // 1. 查询服务单
-<span class="fc" id="L88">        ServiceOrder order = repository.findById(orderId);</span>
+<span class="fc" id="L193">        ServiceOrder order = repository.findById(orderId);</span>
         
-        // 2. 检查状态
-<span class="fc" id="L91">        order.checkAcceptedStatus();</span>
+        // 2. 检查状态（允许待派工、已派工、已收件状态取消）
+<span class="fc" id="L196">        order.checkCanCancel();</span>
         
         // 3. 根据类型选择策略（多态）
-<span class="fc" id="L94">        ServiceOrderCancelStrategy strategy = cancelStrategies.stream()</span>
-<span class="fc" id="L95">                .filter(s -&gt; s.support(order.getType().getCode()))</span>
-<span class="fc" id="L96">                .findFirst()</span>
-<span class="pc" id="L97">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的服务类型: &quot; + order.getType()));</span>
+<span class="fc" id="L199">        ServiceOrderCancelStrategy strategy = cancelStrategies.stream()</span>
+<span class="fc" id="L200">                .filter(s -&gt; s.support(order.getType()))</span>
+<span class="fc" id="L201">                .findFirst()</span>
+<span class="pc" id="L202">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的服务类型: &quot; + order.getType()));</span>
         
         // 4. 执行策略
-<span class="fc" id="L100">        strategy.cancel(order);</span>
+<span class="fc" id="L205">        strategy.cancel(order);</span>
         
         // 5. 保存更新
-<span class="fc" id="L103">        repository.save(order);</span>
+<span class="fc" id="L208">        repository.save(order);</span>
         
-<span class="fc" id="L105">        log.info(&quot;服务单取消完成: orderId={}, status={}&quot;, orderId, order.getStatus());</span>
-<span class="fc" id="L106">    }</span>
+<span class="fc" id="L210">        log.info(&quot;服务单取消完成: orderId={}, status={}&quot;, orderId, order.getStatus());</span>
+<span class="fc" id="L211">    }</span>
 
     /**
      * 内部接口 - 取消服务单（被aftersale模块调用）
      */
     @Transactional
     public void cancelServiceOrderByAftersale(Long aftersalesId, String reason) {
-<span class="fc" id="L113">        log.info(&quot;售后模块取消服务单: aftersalesId={}, reason={}&quot;, aftersalesId, reason);</span>
-        // 实际项目中需要实现取消逻辑
-        // 这里简化处理
-<span class="fc" id="L116">    }</span>
+<span class="fc" id="L218">        log.info(&quot;售后模块取消服务单: aftersalesId={}, reason={}&quot;, aftersalesId, reason);</span>
+        
+        // 1. 根据售后单ID查询服务单
+<span class="fc" id="L221">        ServiceOrder order = repository.findByAftersaleId(aftersalesId);</span>
+<span class="fc bfc" id="L222" title="All 2 branches covered.">        if (order == null) {</span>
+<span class="fc" id="L223">            log.warn(&quot;未找到对应的服务单: aftersalesId={}&quot;, aftersalesId);</span>
+<span class="fc" id="L224">            return;</span>
+        }
+        
+        // 2. 检查状态（允许待接收、待派工、已派工、已收件状态取消）
+<span class="fc bfc" id="L228" title="All 2 branches covered.">        if (!order.getStatus().canCancel()) {</span>
+<span class="fc" id="L229">            log.warn(&quot;服务单状态不允许取消: orderId={}, status={}&quot;, order.getId(), order.getStatus());</span>
+<span class="fc" id="L230">            throw new IllegalArgumentException(&quot;服务单状态不允许取消: &quot; + order.getStatus());</span>
+        }
+        
+        // 3. 根据类型选择策略（多态）
+<span class="fc" id="L234">        ServiceOrderCancelStrategy strategy = cancelStrategies.stream()</span>
+<span class="fc" id="L235">                .filter(s -&gt; s.support(order.getType()))</span>
+<span class="fc" id="L236">                .findFirst()</span>
+<span class="pc" id="L237">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的服务类型: &quot; + order.getType()));</span>
+        
+        // 4. 执行策略
+<span class="fc" id="L240">        strategy.cancel(order);</span>
+        
+        // 5. 保存更新
+<span class="fc" id="L243">        repository.save(order);</span>
+        
+<span class="fc" id="L245">        log.info(&quot;服务单取消完成: orderId={}, aftersalesId={}, status={}&quot;, </span>
+<span class="fc" id="L246">                order.getId(), aftersalesId, order.getStatus());</span>
+<span class="fc" id="L247">    }</span>
 }
 
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

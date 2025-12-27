@@ -1,7 +1,7 @@
 package cn.edu.xmu.service.controller;
 
-import cn.edu.xmu.common.model.ReturnNo;
-import cn.edu.xmu.common.model.ReturnObject;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.ReturnObject;
 import cn.edu.xmu.service.controller.dto.CreateServiceOrderRequest;
 import cn.edu.xmu.service.service.ServiceOrderService;
 import lombok.RequiredArgsConstructor;
@@ -37,11 +37,18 @@ public class ServiceOrderInternalController {
         
         Integer type = (request != null && request.getType() != null) ? request.getType() : 0;
         String consignee = "";
-        if (request != null && request.getConsignee() != null) {
-            consignee = request.getConsignee().getName();
+        String mobile = "";
+        String address = "";
+        if (request != null) {
+            if (request.getConsignee() != null) {
+                consignee = request.getConsignee().getName() != null ? request.getConsignee().getName() : "";
+                mobile = request.getConsignee().getMobile() != null ? request.getConsignee().getMobile() : "";
+            }
+            address = request.getAddress() != null ? request.getAddress() : "";
         }
         
-        Long serviceOrderId = serviceOrderService.createServiceOrder(shopId, aftersalesId, type, consignee);
+        Long serviceOrderId = serviceOrderService.createServiceOrder(
+                shopId, aftersalesId, type, consignee, address, mobile);
         
         Map<String, Object> data = new HashMap<>();
         data.put("id", serviceOrderId);

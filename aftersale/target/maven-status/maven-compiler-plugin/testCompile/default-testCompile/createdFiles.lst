@@ -1,5 +1,14 @@
-cn/edu/xmu/aftersale/controller/AftersaleControllerTest.class
-cn/edu/xmu/aftersale/model/AftersaleOrderTest.class
+cn/edu/xmu/aftersale/service/AftersaleServiceIntegrationTest.class
 cn/edu/xmu/aftersale/model/strategy/AftersaleStrategyTest.class
+cn/edu/xmu/aftersale/controller/AftersaleControllerWebTest$HttpProtocolTests.class
+cn/edu/xmu/aftersale/model/strategy/AftersaleConfirmStrategyMockTest.class
 cn/edu/xmu/aftersale/AftersaleApplicationTest.class
 cn/edu/xmu/aftersale/service/AftersaleServiceTest.class
+cn/edu/xmu/aftersale/model/AftersaleOrderTest.class
+cn/edu/xmu/aftersale/controller/AftersaleControllerWebTest$AcceptAftersaleTests.class
+cn/edu/xmu/aftersale/controller/AftersaleControllerWebTest$CancelAftersaleTests.class
+cn/edu/xmu/aftersale/controller/AftersaleControllerTest.class
+cn/edu/xmu/aftersale/controller/AftersaleControllerWebTest$ConfirmAftersaleTests.class
+cn/edu/xmu/aftersale/model/strategy/AftersaleCancelStrategyMockTest.class
+cn/edu/xmu/aftersale/controller/AftersaleControllerWebTest.class
+cn/edu/xmu/aftersale/controller/AftersaleControllerWebTest$ProcessReceivedTests.class

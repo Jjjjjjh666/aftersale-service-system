@@ -28,8 +28,10 @@ public class RepairCancelStrategy implements AftersaleCancelStrategy {
             serviceClient.cancelServiceOrder(order.getShopId(), order.getId(), reason);
             log.info("维修服务单已取消: aftersaleId={}", order.getId());
         } catch (Exception e) {
-            log.warn("取消维修服务单失败: aftersaleId={}", order.getId(), e);
-            // 这里可以根据业务需求决定是否继续取消售后单
+            log.error("取消维修服务单失败: aftersaleId={}", order.getId(), e);
+            // 如果服务单取消失败，抛出异常阻止售后单取消
+            // 这样可以保证数据一致性：要么都取消，要么都不取消
+            throw new RuntimeException("取消服务单失败: " + e.getMessage(), e);
         }
         
         // 再取消售后单

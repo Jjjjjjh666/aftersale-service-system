@@ -25,30 +25,39 @@ public class RepairConfirmStrategy implements AftersaleConfirmStrategy {
 <span class="fc" id="L25">        log.info(&quot;执行维修审核策略: orderId={}, confirm={}&quot;, order.getId(), confirm);</span>
         
 <span class="fc bfc" id="L27" title="All 2 branches covered.">        if (Boolean.TRUE.equals(confirm)) {</span>
-            // 同意维修
-<span class="pc bpc" id="L29" title="1 of 2 branches missed.">            order.approve(conclusion != null ? conclusion : &quot;同意维修&quot;);</span>
-<span class="fc" id="L30">            log.info(&quot;维修审核通过: orderId={}, 准备创建服务单&quot;, order.getId());</span>
+            // 审核通过（维修），转换为待完成状态
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">            order.approveToBeCompleted(conclusion != null ? conclusion : &quot;同意维修&quot;);</span>
+<span class="fc" id="L30">            log.info(&quot;维修审核通过: orderId={}, 状态转换为待完成&quot;, order.getId());</span>
             
             // 调用服务模块创建服务单（跨模块调用）
             try {
 <span class="fc" id="L34">                CreateServiceOrderRequest request = new CreateServiceOrderRequest();</span>
-<span class="fc" id="L35">                request.setType(2); // 维修类型</span>
-<span class="fc" id="L36">                serviceClient.createServiceOrder(order.getShopId(), order.getId(), request);</span>
-<span class="fc" id="L37">                log.info(&quot;维修服务单创建成功: aftersaleId={}&quot;, order.getId());</span>
-<span class="fc" id="L38">            } catch (Exception e) {</span>
-<span class="fc" id="L39">                log.error(&quot;创建维修服务单失败: aftersaleId={}&quot;, order.getId(), e);</span>
-<span class="fc" id="L40">                throw new RuntimeException(&quot;创建服务单失败: &quot; + e.getMessage(), e);</span>
-<span class="fc" id="L41">            }</span>
+                // 服务单类型：0-上门服务，1-寄件服务（默认使用上门服务）
+<span class="fc" id="L36">                request.setType(0);</span>
+                // 设置联系人信息（如果后续需要从订单获取客户信息，可以在这里优化）
+<span class="fc" id="L38">                CreateServiceOrderRequest.ConsigneeInfo consignee = new CreateServiceOrderRequest.ConsigneeInfo();</span>
+<span class="fc" id="L39">                consignee.setName(&quot;客户&quot;); // 默认名称，实际应该从订单获取</span>
+<span class="fc" id="L40">                consignee.setMobile(&quot;13800138000&quot;); // 默认手机号，实际应该从订单获取</span>
+<span class="fc" id="L41">                request.setConsignee(consignee);</span>
+                // 设置地址信息（如果后续需要从订单获取地址信息，可以在这里优化）
+<span class="fc" id="L43">                request.setAddress(&quot;待填写地址&quot;); // 默认地址，实际应该从订单获取</span>
+                
+<span class="fc" id="L45">                serviceClient.createServiceOrder(order.getShopId(), order.getId(), request);</span>
+<span class="fc" id="L46">                log.info(&quot;维修服务单创建成功: aftersaleId={}&quot;, order.getId());</span>
+<span class="fc" id="L47">            } catch (Exception e) {</span>
+<span class="fc" id="L48">                log.error(&quot;创建维修服务单失败: aftersaleId={}&quot;, order.getId(), e);</span>
+<span class="fc" id="L49">                throw new RuntimeException(&quot;创建服务单失败: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L50">            }</span>
         } else {
-            // 拒绝维修
-<span class="pc bpc" id="L44" title="1 of 2 branches missed.">            order.approve(conclusion != null ? conclusion : &quot;拒绝维修&quot;);</span>
-<span class="fc" id="L45">            log.info(&quot;维修审核拒绝: orderId={}, reason={}&quot;, order.getId(), conclusion);</span>
+            // 审核不通过，转换为已拒绝状态
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">            order.reject(conclusion != null ? conclusion : &quot;拒绝维修&quot;);</span>
+<span class="fc" id="L54">            log.info(&quot;维修审核拒绝: orderId={}, reason={}&quot;, order.getId(), conclusion);</span>
         }
-<span class="fc" id="L47">    }</span>
+<span class="fc" id="L56">    }</span>
 
     @Override
     public boolean support(Integer type) {
-<span class="fc" id="L51">        return AftersaleType.REPAIR.getCode().equals(type);</span>
+<span class="fc" id="L60">        return AftersaleType.REPAIR.getCode().equals(type);</span>
     }
 }
 

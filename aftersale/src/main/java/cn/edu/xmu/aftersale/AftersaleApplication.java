@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 /**
  * 售后模块启动类
  */
-@SpringBootApplication(scanBasePackages = {"cn.edu.xmu.aftersale", "cn.edu.xmu.common"})
+@SpringBootApplication(scanBasePackages = {"cn.edu.xmu.aftersale", "cn.edu.xmu.javaee.core"})
 @EnableFeignClients
 public class AftersaleApplication {
     public static void main(String[] args) {

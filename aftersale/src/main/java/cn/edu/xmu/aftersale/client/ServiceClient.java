@@ -1,7 +1,7 @@
 package cn.edu.xmu.aftersale.client;
 
 import cn.edu.xmu.aftersale.client.dto.CreateServiceOrderRequest;
-import cn.edu.xmu.common.model.ReturnObject;
+import cn.edu.xmu.javaee.core.model.ReturnObject;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +22,7 @@ public interface ServiceClient {
 
     /**
      * 取消服务单
+     *
      */
     @DeleteMapping("/internal/shops/{shopId}/aftersales/{aftersalesId}/serviceorders/cancel")
     ReturnObject cancelServiceOrder(

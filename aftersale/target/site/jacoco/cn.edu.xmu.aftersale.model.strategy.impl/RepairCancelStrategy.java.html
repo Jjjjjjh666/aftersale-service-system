@@ -28,18 +28,20 @@ public class RepairCancelStrategy implements AftersaleCancelStrategy {
 <span class="fc" id="L28">            serviceClient.cancelServiceOrder(order.getShopId(), order.getId(), reason);</span>
 <span class="fc" id="L29">            log.info(&quot;维修服务单已取消: aftersaleId={}&quot;, order.getId());</span>
 <span class="fc" id="L30">        } catch (Exception e) {</span>
-<span class="fc" id="L31">            log.warn(&quot;取消维修服务单失败: aftersaleId={}&quot;, order.getId(), e);</span>
-            // 这里可以根据业务需求决定是否继续取消售后单
-<span class="fc" id="L33">        }</span>
+<span class="fc" id="L31">            log.error(&quot;取消维修服务单失败: aftersaleId={}&quot;, order.getId(), e);</span>
+            // 如果服务单取消失败，抛出异常阻止售后单取消
+            // 这样可以保证数据一致性：要么都取消，要么都不取消
+<span class="fc" id="L34">            throw new RuntimeException(&quot;取消服务单失败: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L35">        }</span>
         
         // 再取消售后单
-<span class="fc" id="L36">        order.cancel();</span>
-<span class="fc" id="L37">        log.info(&quot;维修售后单已取消: orderId={}&quot;, order.getId());</span>
-<span class="fc" id="L38">    }</span>
+<span class="fc" id="L38">        order.cancel();</span>
+<span class="fc" id="L39">        log.info(&quot;维修售后单已取消: orderId={}&quot;, order.getId());</span>
+<span class="fc" id="L40">    }</span>
 
     @Override
     public boolean support(Integer type) {
-<span class="nc" id="L42">        return AftersaleType.REPAIR.getCode().equals(type);</span>
+<span class="fc" id="L44">        return AftersaleType.REPAIR.getCode().equals(type);</span>
     }
 }
 

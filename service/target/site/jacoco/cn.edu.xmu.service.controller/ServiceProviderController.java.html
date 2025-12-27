@@ -1,25 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceProviderController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.controller</a> &gt; <span class="el_source">ServiceProviderController.java</span></div><h1>ServiceProviderController.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.controller;
 
-import cn.edu.xmu.common.model.ReturnNo;
-import cn.edu.xmu.common.model.ReturnObject;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.ReturnObject;
 import cn.edu.xmu.service.controller.dto.ReviewDraftRequest;
 import cn.edu.xmu.service.service.ServiceProviderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * 服务商管理控制器
  */
-<span class="fc" id="L16">@Slf4j</span>
+<span class="fc" id="L17">@Slf4j</span>
 @RestController
 @RequiredArgsConstructor
 @Validated
 public class ServiceProviderController {
 
     private final ServiceProviderService serviceProviderService;
+
+    @Value(&quot;${oomall.core.page-size.default:10}&quot;)
+    private int defaultPageSize = 10;
+
+    @Value(&quot;${oomall.core.page-size.max:1000}&quot;)
+    private int maxPageSize = 1000;
+
+    /**
+     * 平台管理员查询服务商变更申请
+     * GET /drafts
+     */
+    @GetMapping(&quot;/drafts&quot;)
+    public ReturnObject listDrafts(
+            @RequestParam(value = &quot;page&quot;, required = false) Integer page,
+            @RequestParam(value = &quot;pageSize&quot;, required = false) Integer pageSize,
+            @RequestParam(value = &quot;pagesize&quot;, required = false) Integer pageSizeAlias,
+            @RequestParam(value = &quot;serviceprovidername&quot;, required = false) String serviceProviderName,
+            @RequestParam(value = &quot;providername&quot;, required = false) String providerName,
+            @RequestParam(value = &quot;servicearea&quot;, required = false) String serviceArea,
+            @RequestParam(value = &quot;phone&quot;, required = false) String phone) {
+
+<span class="pc bpc" id="L45" title="1 of 4 branches missed.">        int resolvedPage = (page == null || page &lt;= 0) ? 1 : page;</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        Integer sizeParam = pageSizeAlias != null ? pageSizeAlias : pageSize;</span>
+<span class="pc bpc" id="L47" title="1 of 4 branches missed.">        int resolvedPageSize = (sizeParam == null || sizeParam &lt;= 0) ? defaultPageSize : sizeParam;</span>
+<span class="fc" id="L48">        resolvedPageSize = Math.min(resolvedPageSize, maxPageSize);</span>
+
+<span class="fc" id="L50">        log.info(&quot;平台管理员查询服务商变更申请: providerName={}, contactPerson={}, area={}, phone={}, page={}, pageSize={}&quot;,</span>
+<span class="fc" id="L51">                serviceProviderName, providerName, serviceArea, phone, resolvedPage, resolvedPageSize);</span>
+
+<span class="fc" id="L53">        return new ReturnObject(serviceProviderService.listDrafts(</span>
+                serviceProviderName,
+                providerName,
+                serviceArea,
+                phone,
+                resolvedPage,
+                resolvedPageSize));
+    }
+
+    /**
+     * 平台管理员查看变更历史
+     * GET /drafts/{draftid}/history
+     */
+    @GetMapping(&quot;/drafts/{draftid}/history&quot;)
+    public ReturnObject getDraftHistory(@PathVariable(&quot;draftid&quot;) Long draftId) {
+<span class="fc" id="L68">        log.info(&quot;平台管理员查看变更历史: draftId={}&quot;, draftId);</span>
+<span class="fc" id="L69">        return new ReturnObject(serviceProviderService.getDraftHistory(draftId));</span>
+    }
 
     /**
      * 平台管理员审核服务商变更
@@ -29,13 +77,13 @@ public class ServiceProviderController {
     public ReturnObject reviewDraft(
             @PathVariable(&quot;draftid&quot;) Long draftId,
             @Valid @RequestBody ReviewDraftRequest request) {
-        
-<span class="fc" id="L33">        log.info(&quot;平台管理员审核服务商变更API: draftId={}, conclusion={}&quot;, </span>
-<span class="fc" id="L34">                draftId, request.getConclusion());</span>
-        
-<span class="fc" id="L36">        serviceProviderService.reviewDraft(draftId, request.getConclusion(), request.getOpinion());</span>
-        
-<span class="fc" id="L38">        return new ReturnObject(ReturnNo.OK);</span>
+
+<span class="fc" id="L81">        log.info(&quot;平台管理员审核服务商变更API: draftId={}, conclusion={}&quot;,</span>
+<span class="fc" id="L82">                draftId, request.getConclusion());</span>
+
+<span class="fc" id="L84">        serviceProviderService.reviewDraft(draftId, request.getConclusion(), request.getOpinion());</span>
+
+<span class="fc" id="L86">        return new ReturnObject(ReturnNo.OK);</span>
     }
 }
 

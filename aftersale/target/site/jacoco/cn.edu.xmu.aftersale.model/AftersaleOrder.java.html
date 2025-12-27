@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AftersaleOrder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Aftersale Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.aftersale.model</a> &gt; <span class="el_source">AftersaleOrder.java</span></div><h1>AftersaleOrder.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.aftersale.model;
 
 import cn.edu.xmu.aftersale.dao.po.AftersaleOrderPo;
-import cn.edu.xmu.common.exception.BusinessException;
-import cn.edu.xmu.common.model.ReturnNo;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,10 +22,16 @@ public class AftersaleOrder {
     private Long id;
     private Long shopId;
     private Long orderId;
+    private Long customerId;
+    private Long productId;
     private Integer type; // 0-退货 1-换货 2-维修
     private AftersaleStatus status;
     private String reason;
     private String conclusion;
+    /** 客户寄回商品的运单ID */
+    private Long expressId;
+    /** 商家发货（换货/返件）的运单ID */
+    private Long returnExpressId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -33,120 +39,161 @@ public class AftersaleOrder {
      * 从PO构建领域对象
      */
     public static AftersaleOrder fromPo(AftersaleOrderPo po) {
-<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if (po == null) {</span>
-<span class="nc" id="L37">            return null;</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        if (po == null) {</span>
+<span class="nc" id="L43">            return null;</span>
         }
-<span class="fc" id="L39">        return AftersaleOrder.builder()</span>
-<span class="fc" id="L40">                .id(po.getId())</span>
-<span class="fc" id="L41">                .shopId(po.getShopId())</span>
-<span class="fc" id="L42">                .orderId(po.getOrderId())</span>
-<span class="fc" id="L43">                .type(po.getType())</span>
-<span class="fc" id="L44">                .status(convertStatus(po.getStatus()))</span>
-<span class="fc" id="L45">                .reason(po.getReason())</span>
-<span class="fc" id="L46">                .conclusion(po.getConclusion())</span>
-<span class="fc" id="L47">                .createdAt(po.getGmtCreate())</span>
-<span class="fc" id="L48">                .updatedAt(po.getGmtModified())</span>
-<span class="fc" id="L49">                .build();</span>
+<span class="fc" id="L45">        return AftersaleOrder.builder()</span>
+<span class="fc" id="L46">                .id(po.getId())</span>
+<span class="fc" id="L47">                .shopId(po.getShopId())</span>
+<span class="fc" id="L48">                .orderId(po.getOrderId())</span>
+<span class="fc" id="L49">                .customerId(po.getCustomerId())</span>
+<span class="fc" id="L50">                .productId(po.getProductId())</span>
+<span class="fc" id="L51">                .type(po.getType())</span>
+<span class="fc" id="L52">                .status(convertStatus(po.getStatus()))</span>
+<span class="fc" id="L53">                .reason(po.getReason())</span>
+<span class="fc" id="L54">                .conclusion(po.getConclusion())</span>
+<span class="fc" id="L55">                .expressId(po.getExpressId())</span>
+<span class="fc" id="L56">                .returnExpressId(po.getReturnExpressId())</span>
+<span class="fc" id="L57">                .createdAt(po.getGmtCreate())</span>
+<span class="fc" id="L58">                .updatedAt(po.getGmtModified())</span>
+<span class="fc" id="L59">                .build();</span>
     }
 
     /**
      * 转换为PO
      */
     public AftersaleOrderPo toPo() {
-<span class="fc" id="L56">        AftersaleOrderPo po = new AftersaleOrderPo();</span>
-<span class="fc" id="L57">        po.setId(this.id);</span>
-<span class="fc" id="L58">        po.setShopId(this.shopId);</span>
-<span class="fc" id="L59">        po.setOrderId(this.orderId);</span>
-<span class="fc" id="L60">        po.setType(this.type);</span>
-<span class="fc" id="L61">        po.setStatus(convertStatusToInt(this.status));</span>
-<span class="fc" id="L62">        po.setReason(this.reason);</span>
-<span class="fc" id="L63">        po.setConclusion(this.conclusion);</span>
-<span class="fc" id="L64">        po.setGmtCreate(this.createdAt);</span>
-<span class="fc" id="L65">        po.setGmtModified(this.updatedAt);</span>
-<span class="fc" id="L66">        return po;</span>
+<span class="fc" id="L66">        AftersaleOrderPo po = new AftersaleOrderPo();</span>
+<span class="fc" id="L67">        po.setId(this.id);</span>
+<span class="fc" id="L68">        po.setShopId(this.shopId);</span>
+<span class="fc" id="L69">        po.setOrderId(this.orderId);</span>
+<span class="fc" id="L70">        po.setCustomerId(this.customerId);</span>
+<span class="fc" id="L71">        po.setProductId(this.productId);</span>
+<span class="fc" id="L72">        po.setType(this.type);</span>
+<span class="fc" id="L73">        po.setStatus(convertStatusToInt(this.status));</span>
+<span class="fc" id="L74">        po.setReason(this.reason);</span>
+<span class="fc" id="L75">        po.setConclusion(this.conclusion);</span>
+<span class="fc" id="L76">        po.setExpressId(this.expressId);</span>
+<span class="fc" id="L77">        po.setReturnExpressId(this.returnExpressId);</span>
+<span class="fc" id="L78">        po.setGmtCreate(this.createdAt);</span>
+<span class="fc" id="L79">        po.setGmtModified(this.updatedAt);</span>
+<span class="fc" id="L80">        return po;</span>
     }
 
     /**
      * 将数据库状态码转换为状态枚举
      */
     private static AftersaleStatus convertStatus(Integer statusCode) {
-<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        if (statusCode == null) {</span>
-<span class="nc" id="L74">            return AftersaleStatus.PENDING;</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (statusCode == null) {</span>
+<span class="nc" id="L88">            return AftersaleStatus.PENDING;</span>
         }
-<span class="pc bpc" id="L76" title="3 of 4 branches missed.">        switch (statusCode) {</span>
-<span class="nc" id="L77">            case 0: return AftersaleStatus.PENDING;   // 待审核</span>
-<span class="fc" id="L78">            case 1: return AftersaleStatus.APPROVED;  // 已通过</span>
-<span class="nc" id="L79">            case 2: return AftersaleStatus.CANCELLED; // 已拒绝</span>
-<span class="nc" id="L80">            default: return AftersaleStatus.PENDING;</span>
-        }
+<span class="pc bpc" id="L90" title="2 of 8 branches missed.">        return switch (statusCode) {</span>
+<span class="fc" id="L91">            case 0 -&gt; AftersaleStatus.PENDING;           // 待审核</span>
+<span class="fc" id="L92">            case 1 -&gt; AftersaleStatus.TO_BE_RECEIVED;    // 待验收</span>
+<span class="fc" id="L93">            case 2 -&gt; AftersaleStatus.TO_BE_COMPLETED;   // 待完成</span>
+<span class="fc" id="L94">            case 3 -&gt; AftersaleStatus.RECEIVED;          // 已验收</span>
+<span class="fc" id="L95">            case 4 -&gt; AftersaleStatus.REJECTED;          // 已拒绝</span>
+<span class="fc" id="L96">            case 5 -&gt; AftersaleStatus.COMPLETED;         // 已完成</span>
+<span class="nc" id="L97">            case 6 -&gt; AftersaleStatus.CANCELLED;         // 已取消</span>
+<span class="nc" id="L98">            default -&gt; AftersaleStatus.PENDING;</span>
+        };
     }
 
     /**
      * 将状态枚举转换为数据库状态码
      */
     private static Integer convertStatusToInt(AftersaleStatus status) {
-<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (status == null) {</span>
-<span class="nc" id="L89">            return 0;</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if (status == null) {</span>
+<span class="nc" id="L107">            return 0;</span>
         }
-<span class="pc bpc" id="L91" title="3 of 4 branches missed.">        switch (status) {</span>
-<span class="nc" id="L92">            case PENDING: return 0;</span>
-<span class="nc" id="L93">            case APPROVED: return 1;</span>
-<span class="fc" id="L94">            case CANCELLED: return 2;</span>
-<span class="nc" id="L95">            default: return 0;</span>
-        }
+<span class="fc bfc" id="L109" title="All 7 branches covered.">        return switch (status) {</span>
+<span class="fc" id="L110">            case PENDING -&gt; 0;</span>
+<span class="fc" id="L111">            case TO_BE_RECEIVED -&gt; 1;</span>
+<span class="fc" id="L112">            case TO_BE_COMPLETED -&gt; 2;</span>
+<span class="fc" id="L113">            case RECEIVED -&gt; 3;</span>
+<span class="fc" id="L114">            case REJECTED -&gt; 4;</span>
+<span class="fc" id="L115">            case COMPLETED -&gt; 5;</span>
+<span class="fc" id="L116">            case CANCELLED -&gt; 6;</span>
+        };
     }
 
-    /**
-     * 检查是否为待审核状态
-     */
+    /** 检查是否为待审核 */
     public void checkPendingStatus() {
-<span class="fc bfc" id="L103" title="All 2 branches covered.">        if (!AftersaleStatus.PENDING.equals(this.status)) {</span>
-<span class="fc" id="L104">            throw new BusinessException(ReturnNo.AFTERSALE_STATE_INVALID, </span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        if (!AftersaleStatus.PENDING.equals(this.status)) {</span>
+<span class="fc" id="L123">            throw new BusinessException(ReturnNo.AFTERSALE_STATE_INVALID,</span>
                     &quot;只有待审核状态的售后单才能进行审核&quot;);
         }
-<span class="fc" id="L107">    }</span>
-
-    /**
-     * 检查是否为已审核状态
-     */
-    public void checkApprovedStatus() {
-<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (!AftersaleStatus.APPROVED.equals(this.status)) {</span>
-<span class="fc" id="L114">            throw new BusinessException(ReturnNo.AFTERSALE_STATE_INVALID, </span>
-                    &quot;只有已审核状态的售后单才能取消&quot;);
-        }
-<span class="fc" id="L117">    }</span>
-
-    /**
-     * 更新为已审核状态
-     */
-    public void approve(String conclusion) {
-<span class="fc" id="L123">        this.status = AftersaleStatus.APPROVED;</span>
-<span class="fc" id="L124">        this.conclusion = conclusion;</span>
-<span class="fc" id="L125">        this.updatedAt = LocalDateTime.now();</span>
 <span class="fc" id="L126">    }</span>
 
-    /**
-     * 更新为已取消状态
-     */
-    public void cancel() {
-<span class="fc" id="L132">        this.status = AftersaleStatus.CANCELLED;</span>
-<span class="fc" id="L133">        this.updatedAt = LocalDateTime.now();</span>
+    /** 检查是否可以取消（待验收或待完成状态） */
+    public void checkCanCancel() {
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (!this.status.canCancel()) {</span>
+<span class="fc" id="L131">            throw new BusinessException(ReturnNo.AFTERSALE_STATE_INVALID,</span>
+                    &quot;只有待验收或待完成状态的售后单才能取消&quot;);
+        }
 <span class="fc" id="L134">    }</span>
 
-    /**
-     * 审核拒绝，记录结论
-     */
-    public void reject(String conclusion) {
-<span class="fc" id="L140">        this.status = AftersaleStatus.CANCELLED;</span>
-<span class="fc" id="L141">        this.conclusion = conclusion;</span>
-<span class="fc" id="L142">        this.updatedAt = LocalDateTime.now();</span>
-<span class="fc" id="L143">    }</span>
+    /** 审核通过（退货/换货），转换为待验收 */
+    public void approveToBeReceived(String conclusion) {
+<span class="fc" id="L138">        this.status = AftersaleStatus.TO_BE_RECEIVED;</span>
+<span class="fc" id="L139">        this.conclusion = conclusion;</span>
+<span class="fc" id="L140">        this.updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L141">    }</span>
 
-    /**
-     * 获取售后类型
-     */
+    /** 审核通过（维修），转换为待完成 */
+    public void approveToBeCompleted(String conclusion) {
+<span class="fc" id="L145">        this.status = AftersaleStatus.TO_BE_COMPLETED;</span>
+<span class="fc" id="L146">        this.conclusion = conclusion;</span>
+<span class="fc" id="L147">        this.updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L148">    }</span>
+
+    /** 更新为已取消 */
+    public void cancel() {
+<span class="fc" id="L152">        this.status = AftersaleStatus.CANCELLED;</span>
+<span class="fc" id="L153">        this.updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L154">    }</span>
+
+    /** 审核拒绝 */
+    public void reject(String conclusion) {
+<span class="fc" id="L158">        this.status = AftersaleStatus.REJECTED;</span>
+<span class="fc" id="L159">        this.conclusion = conclusion;</span>
+<span class="fc" id="L160">        this.updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L161">    }</span>
+
+    /** 验收前状态校验 */
+    public void checkCanReceive() {
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        if (!AftersaleStatus.TO_BE_RECEIVED.equals(this.status)) {</span>
+<span class="fc" id="L166">            throw new BusinessException(ReturnNo.AFTERSALE_STATE_INVALID,</span>
+                    &quot;只有待验收状态的售后单才能进行验收&quot;);
+        }
+<span class="fc" id="L169">    }</span>
+
+    /** 已验收处理前状态校验 */
+    public void checkCanProcessReceived() {
+<span class="fc bfc" id="L173" title="All 2 branches covered.">        if (!AftersaleStatus.RECEIVED.equals(this.status)) {</span>
+<span class="fc" id="L174">            throw new BusinessException(ReturnNo.AFTERSALE_STATE_INVALID,</span>
+                    &quot;只有已验收状态的售后单才能进行后续处理&quot;);
+        }
+<span class="fc" id="L177">    }</span>
+
+    /** 验收通过，转为已验收 */
+    public void accept(String conclusion) {
+<span class="fc" id="L181">        this.status = AftersaleStatus.RECEIVED;</span>
+<span class="fc" id="L182">        this.conclusion = conclusion;</span>
+<span class="fc" id="L183">        this.updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L184">    }</span>
+
+    /** 完成售后单 */
+    public void complete(String conclusion) {
+<span class="fc" id="L188">        this.status = AftersaleStatus.COMPLETED;</span>
+<span class="fc" id="L189">        this.conclusion = conclusion;</span>
+<span class="fc" id="L190">        this.updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L191">    }</span>
+
+    /** 获取售后类型 */
     public AftersaleType getAftersaleType() {
-<span class="fc" id="L149">        return AftersaleType.valueOf(this.type);</span>
+<span class="fc" id="L195">        return AftersaleType.valueOf(this.type);</span>
     }
 }
+
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

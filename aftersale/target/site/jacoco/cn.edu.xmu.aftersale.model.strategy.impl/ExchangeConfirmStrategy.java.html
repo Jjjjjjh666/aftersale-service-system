@@ -1,39 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExchangeConfirmStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Aftersale Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.aftersale.model.strategy.impl</a> &gt; <span class="el_source">ExchangeConfirmStrategy.java</span></div><h1>ExchangeConfirmStrategy.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.aftersale.model.strategy.impl;
 
+import cn.edu.xmu.aftersale.client.LogisticsClient;
+import cn.edu.xmu.aftersale.client.dto.CreatePackageRequest;
+import cn.edu.xmu.aftersale.client.dto.CreatePackageResponse;
 import cn.edu.xmu.aftersale.model.AftersaleOrder;
 import cn.edu.xmu.aftersale.model.AftersaleType;
 import cn.edu.xmu.aftersale.model.strategy.AftersaleConfirmStrategy;
+import cn.edu.xmu.javaee.core.model.InternalReturnObject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 换货审核策略
- * 审核通过后需要等待客户寄回商品，商家再发出新商品
+ * 审核通过后需要创建换货运单
  */
-<span class="fc" id="L13">@Slf4j</span>
+<span class="fc" id="L21">@Slf4j</span>
 @Component
-<span class="fc" id="L15">public class ExchangeConfirmStrategy implements AftersaleConfirmStrategy {</span>
+@RequiredArgsConstructor
+public class ExchangeConfirmStrategy implements AftersaleConfirmStrategy {
+
+    private final LogisticsClient logisticsClient;
 
     @Override
     public void confirm(AftersaleOrder order, Boolean confirm, String conclusion) {
-<span class="nc" id="L19">        log.info(&quot;执行换货审核策略: orderId={}, confirm={}&quot;, order.getId(), confirm);</span>
+<span class="fc" id="L30">        log.info(&quot;执行换货审核策略: orderId={}, confirm={}&quot;, order.getId(), confirm);</span>
         
-<span class="nc bnc" id="L21" title="All 2 branches missed.">        if (Boolean.TRUE.equals(confirm)) {</span>
-            // 同意换货
-<span class="nc bnc" id="L23" title="All 2 branches missed.">            order.approve(conclusion != null ? conclusion : &quot;同意换货&quot;);</span>
-<span class="nc" id="L24">            log.info(&quot;换货审核通过: orderId={}, 等待客户寄回旧商品&quot;, order.getId());</span>
-            // 后续业务：通知客户寄回地址、准备新商品库存等
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (Boolean.TRUE.equals(confirm)) {</span>
+            // 审核通过（换货），转换为待验收状态
+<span class="fc bfc" id="L34" title="All 2 branches covered.">            order.approveToBeReceived(conclusion != null ? conclusion : &quot;同意换货&quot;);</span>
+<span class="fc" id="L35">            log.info(&quot;换货审核通过: orderId={}, 状态转换为待验收&quot;, order.getId());</span>
+            
+            // 创建换货运单（客户寄回商品到商家）
+            try {
+<span class="fc" id="L39">                Long expressId = createExchangePackage(order);</span>
+<span class="fc" id="L40">                order.setExpressId(expressId);</span>
+<span class="fc" id="L41">                log.info(&quot;换货运单创建成功: aftersaleId={}, expressId={}&quot;, order.getId(), expressId);</span>
+<span class="nc" id="L42">            } catch (Exception e) {</span>
+<span class="nc" id="L43">                log.error(&quot;创建换货运单失败: aftersaleId={}&quot;, order.getId(), e);</span>
+<span class="nc" id="L44">                throw new RuntimeException(&quot;创建换货运单失败: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L45">            }</span>
         } else {
-            // 拒绝换货
-<span class="nc bnc" id="L28" title="All 2 branches missed.">            order.approve(conclusion != null ? conclusion : &quot;拒绝换货&quot;);</span>
-<span class="nc" id="L29">            log.info(&quot;换货审核拒绝: orderId={}, reason={}&quot;, order.getId(), conclusion);</span>
+            // 审核不通过，转换为已拒绝状态
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">            order.reject(conclusion != null ? conclusion : &quot;拒绝换货&quot;);</span>
+<span class="fc" id="L49">            log.info(&quot;换货审核拒绝: orderId={}, reason={}&quot;, order.getId(), conclusion);</span>
         }
-<span class="nc" id="L31">    }</span>
+<span class="fc" id="L51">    }</span>
 
     @Override
     public boolean support(Integer type) {
-<span class="nc" id="L35">        return AftersaleType.EXCHANGE.getCode().equals(type);  // type=0</span>
+<span class="fc" id="L55">        return AftersaleType.EXCHANGE.getCode().equals(type);</span>
+    }
+    
+    /**
+     * 创建换货运单
+     * 客户寄回商品到商家仓库
+     */
+    private Long createExchangePackage(AftersaleOrder order) {
+        // 构建收件地址（商家仓库地址）
+        CreatePackageRequest.AddressInfo address = 
+<span class="fc" id="L65">            CreatePackageRequest.AddressInfo.builder()</span>
+<span class="fc" id="L66">                .name(&quot;商家仓库&quot;)  // 实际应该从商家信息获取</span>
+<span class="fc" id="L67">                .mobile(&quot;400-888-8888&quot;)</span>
+<span class="fc" id="L68">                .regionId(100000L)  // 实际应该从商家仓库信息获取</span>
+<span class="fc" id="L69">                .address(&quot;商家仓库地址&quot;)</span>
+<span class="fc" id="L70">                .build();</span>
+        
+        // 构建托寄物信息（换货商品）
+        CreatePackageRequest.CargoDetail cargo = 
+<span class="fc" id="L74">            CreatePackageRequest.CargoDetail.builder()</span>
+<span class="fc" id="L75">                .id(order.getId())</span>
+<span class="fc" id="L76">                .name(&quot;换货商品&quot;)</span>
+<span class="fc" id="L77">                .count(1)</span>
+<span class="fc" id="L78">                .unit(&quot;件&quot;)</span>
+<span class="fc" id="L79">                .weight(1000)  // 1kg，实际应该从产品信息获取</span>
+<span class="fc" id="L80">                .amount(0)     // 无价值申报</span>
+<span class="fc" id="L81">                .build();</span>
+        
+<span class="fc" id="L83">        List&lt;CreatePackageRequest.CargoDetail&gt; cargoList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L84">        cargoList.add(cargo);</span>
+        
+        // 构建完整请求
+<span class="fc" id="L87">        CreatePackageRequest request = CreatePackageRequest.builder()</span>
+<span class="fc" id="L88">                .contractId(0L)          // 0表示自动选择物流合同</span>
+<span class="fc" id="L89">                .payMethod(2)            // 2-收方付（商家承担运费）</span>
+<span class="fc" id="L90">                .address(address)</span>
+<span class="fc" id="L91">                .cargoDetails(cargoList)</span>
+<span class="fc" id="L92">                .build();</span>
+        
+        // 调用物流API
+<span class="fc" id="L95">        InternalReturnObject&lt;CreatePackageResponse&gt; response = </span>
+<span class="fc" id="L96">            logisticsClient.createPackage(</span>
+<span class="fc" id="L97">                order.getShopId(),</span>
+                &quot;Bearer token&quot;,  // 实际应该从上下文获取
+                request
+            );
+        
+<span class="fc" id="L102">        CreatePackageResponse packageData = response.getData();</span>
+<span class="fc" id="L103">        log.info(&quot;物流运单创建成功: packageId={}, billCode={}&quot;, </span>
+<span class="fc" id="L104">                 packageData.getId(), packageData.getBillCode());</span>
+        
+<span class="fc" id="L106">        return packageData.getId();</span>
     }
 }
-
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

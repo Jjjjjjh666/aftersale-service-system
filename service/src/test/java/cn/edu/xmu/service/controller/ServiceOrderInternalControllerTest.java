@@ -1,6 +1,6 @@
 package cn.edu.xmu.service.controller;
 
-import cn.edu.xmu.common.model.ReturnObject;
+import cn.edu.xmu.javaee.core.model.ReturnObject;
 import cn.edu.xmu.service.controller.dto.CreateServiceOrderRequest;
 import cn.edu.xmu.service.service.ServiceOrderService;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,13 +34,16 @@ class ServiceOrderInternalControllerTest {
         request.setType(1);
         CreateServiceOrderRequest.ConsigneeInfo consignee = new CreateServiceOrderRequest.ConsigneeInfo();
         consignee.setName("Alice");
+        consignee.setMobile("13900000000");
         request.setConsignee(consignee);
+        request.setAddress("地址");
 
-        when(serviceOrderService.createServiceOrder(1L, 2L, 1, "Alice")).thenReturn(88L);
+        when(serviceOrderService.createServiceOrder(1L, 2L, 1, "Alice", "地址", "13900000000"))
+                .thenReturn(88L);
 
         ReturnObject result = controller.createServiceOrder(1L, 2L, request);
 
-        verify(serviceOrderService).createServiceOrder(1L, 2L, 1, "Alice");
+        verify(serviceOrderService).createServiceOrder(1L, 2L, 1, "Alice", "地址", "13900000000");
         Map<?, ?> data = (Map<?, ?>) result.getData();
         assertEquals(88L, data.get("id"));
         assertEquals(1, data.get("type"));
@@ -48,11 +51,12 @@ class ServiceOrderInternalControllerTest {
 
     @Test
     void createServiceOrderShouldFallbackWhenRequestMissing() {
-        when(serviceOrderService.createServiceOrder(5L, 6L, 0, "")).thenReturn(99L);
+        when(serviceOrderService.createServiceOrder(5L, 6L, 0, "", "", ""))
+                .thenReturn(99L);
 
         ReturnObject result = controller.createServiceOrder(5L, 6L, null);
 
-        verify(serviceOrderService).createServiceOrder(5L, 6L, 0, "");
+        verify(serviceOrderService).createServiceOrder(5L, 6L, 0, "", "", "");
         Map<?, ?> data = (Map<?, ?>) result.getData();
         assertEquals(99L, data.get("id"));
         assertEquals(0, data.get("type"));

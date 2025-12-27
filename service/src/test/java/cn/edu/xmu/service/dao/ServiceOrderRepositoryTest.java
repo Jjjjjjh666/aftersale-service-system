@@ -1,6 +1,6 @@
 package cn.edu.xmu.service.dao;
 
-import cn.edu.xmu.common.exception.BusinessException;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
 import cn.edu.xmu.service.dao.po.ServiceOrderPo;
 import cn.edu.xmu.service.model.ServiceOrder;
 import cn.edu.xmu.service.model.ServiceOrderStatus;
@@ -38,6 +38,7 @@ class ServiceOrderRepositoryTest {
         ServiceOrder order = repository.findById(1L);
 
         assertEquals(1L, order.getId());
+        assertEquals(ServiceOrderStatus.PENDING, order.getStatus());
         verify(mapper).findById(1L);
     }
 
@@ -81,14 +82,12 @@ class ServiceOrderRepositoryTest {
     private ServiceOrder buildOrder() {
         return ServiceOrder.builder()
                 .id(1L)
-                .shopId(2L)
-                .aftersalesId(3L)
-                .serviceProviderId(4L)
-                .type(ServiceOrderType.ONSITE_REPAIR)
-                .status(ServiceOrderStatus.CREATED)
+                .type(ServiceOrderType.ONSITE_REPAIR.getCode())
                 .consignee("张三")
                 .address("地址")
-                .trackingNumber("TN")
+                .mobile("138")
+                .status(ServiceOrderStatus.PENDING)
+                .aftersaleId(10L)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -97,14 +96,12 @@ class ServiceOrderRepositoryTest {
     private ServiceOrderPo buildPo() {
         ServiceOrderPo po = new ServiceOrderPo();
         po.setId(1L);
-        po.setShopId(2L);
-        po.setAftersalesId(3L);
-        po.setServiceProviderId(4L);
         po.setType(ServiceOrderType.ONSITE_REPAIR.getCode());
-        po.setStatus("CREATED");
         po.setConsignee("张三");
         po.setAddress("地址");
-        po.setTrackingNumber("TN");
+        po.setMobile("138");
+        po.setStatus(0);
+        po.setAftersaleId(10L);
         po.setCreatedAt(LocalDateTime.now());
         po.setUpdatedAt(LocalDateTime.now());
         return po;

@@ -1,31 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReturnCancelStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Aftersale Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.aftersale.model.strategy.impl</a> &gt; <span class="el_source">ReturnCancelStrategy.java</span></div><h1>ReturnCancelStrategy.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.aftersale.model.strategy.impl;
 
+import cn.edu.xmu.aftersale.client.LogisticsClient;
 import cn.edu.xmu.aftersale.model.AftersaleOrder;
 import cn.edu.xmu.aftersale.model.AftersaleType;
 import cn.edu.xmu.aftersale.model.strategy.AftersaleCancelStrategy;
+import cn.edu.xmu.javaee.core.model.InternalReturnObject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
  * 退货取消策略
+ * 取消时需要取消对应的运单
  */
-<span class="fc" id="L12">@Slf4j</span>
+<span class="fc" id="L16">@Slf4j</span>
 @Component
-<span class="fc" id="L14">public class ReturnCancelStrategy implements AftersaleCancelStrategy {</span>
+@RequiredArgsConstructor
+public class ReturnCancelStrategy implements AftersaleCancelStrategy {
+
+    private final LogisticsClient logisticsClient;
 
     @Override
     public void cancel(AftersaleOrder order, String reason) {
-<span class="nc" id="L18">        log.info(&quot;执行退货取消策略: orderId={}, reason={}&quot;, order.getId(), reason);</span>
+<span class="fc" id="L25">        log.info(&quot;执行退货取消策略: orderId={}, reason={}&quot;, order.getId(), reason);</span>
         
-<span class="nc" id="L20">        order.cancel();</span>
-<span class="nc" id="L21">        log.info(&quot;退货售后单已取消: orderId={}&quot;, order.getId());</span>
-        // 后续业务：取消退货物流单、通知客户等
-<span class="nc" id="L23">    }</span>
+        // 取消售后单
+<span class="fc" id="L28">        order.cancel();</span>
+<span class="fc" id="L29">        log.info(&quot;退货售后单已取消: orderId={}&quot;, order.getId());</span>
+        
+        // 如果有运单ID，需要取消运单
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (order.getExpressId() != null) {</span>
+            try {
+<span class="fc" id="L34">                log.info(&quot;准备取消退货运单: expressId={}&quot;, order.getExpressId());</span>
+                
+<span class="fc" id="L36">                InternalReturnObject&lt;Void&gt; response = </span>
+<span class="fc" id="L37">                    logisticsClient.cancelPackage(</span>
+<span class="fc" id="L38">                        order.getShopId(),</span>
+<span class="fc" id="L39">                        order.getExpressId(),</span>
+                        &quot;Bearer token&quot;  // 实际应该从上下文获取
+                    );
+                
+<span class="fc" id="L43">                log.info(&quot;退货运单取消成功: expressId={}&quot;, order.getExpressId());</span>
+<span class="fc" id="L44">            } catch (Exception e) {</span>
+<span class="fc" id="L45">                log.error(&quot;取消退货运单失败: expressId={}&quot;, order.getExpressId(), e);</span>
+<span class="fc" id="L46">                throw new RuntimeException(&quot;取消退货运单失败: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L47">            }</span>
+        } else {
+<span class="fc" id="L49">            log.info(&quot;售后单没有运单，无需取消运单&quot;);</span>
+        }
+<span class="fc" id="L51">    }</span>
 
     @Override
     public boolean support(Integer type) {
-<span class="nc" id="L27">        return AftersaleType.RETURN.getCode().equals(type);</span>
+<span class="fc" id="L55">        return AftersaleType.RETURN.getCode().equals(type);</span>
     }
 }
-
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

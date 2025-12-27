@@ -16,25 +16,31 @@ import org.springframework.stereotype.Component;
 
     @Override
     public void cancel(ServiceOrder order) {
-<span class="fc" id="L19">        log.info(&quot;执行上门维修取消策略: orderId={}&quot;, order.getId());</span>
+<span class="fc" id="L19">        log.info(&quot;执行上门维修取消策略: orderId={}, status={}&quot;, order.getId(), order.getStatus());</span>
         
         // 取消服务单
 <span class="fc" id="L22">        order.cancel();</span>
         
         // 上门维修取消特定逻辑
 <span class="fc" id="L25">        log.info(&quot;上门维修服务单已取消: orderId={}&quot;, order.getId());</span>
-<span class="fc" id="L26">        log.info(&quot;后续需要: 1.通知客户取消 2.释放技师资源 3.取消预约时间&quot;);</span>
+        
+        // 根据当前状态执行不同的取消逻辑
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (order.getServiceStaffId() != null) {</span>
+<span class="fc" id="L29">            log.info(&quot;后续需要: 1.通知客户取消 2.通知已分配的技师 3.释放预约时间&quot;);</span>
+        } else {
+<span class="fc" id="L31">            log.info(&quot;后续需要: 1.通知客户取消&quot;);</span>
+        }
         
         // 实际业务中可能需要：
         // 1. 通知客户服务已取消
         // 2. 通知已分配的技师
         // 3. 释放预约的时间段
         // 4. 记录取消原因
-<span class="fc" id="L33">    }</span>
+<span class="fc" id="L39">    }</span>
 
     @Override
     public boolean support(Integer type) {
-<span class="fc" id="L37">        return ServiceOrderType.ONSITE_REPAIR.getCode().equals(type);</span>
+<span class="fc" id="L43">        return ServiceOrderType.ONSITE_REPAIR.getCode().equals(type);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

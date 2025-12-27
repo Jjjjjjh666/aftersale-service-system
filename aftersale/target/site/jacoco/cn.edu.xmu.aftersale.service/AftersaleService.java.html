@@ -2,9 +2,10 @@
 
 import cn.edu.xmu.aftersale.dao.AftersaleOrderRepository;
 import cn.edu.xmu.aftersale.model.AftersaleOrder;
-import cn.edu.xmu.aftersale.model.AftersaleStatus;
+import cn.edu.xmu.aftersale.model.strategy.AftersaleAcceptStrategy;
 import cn.edu.xmu.aftersale.model.strategy.AftersaleCancelStrategy;
 import cn.edu.xmu.aftersale.model.strategy.AftersaleConfirmStrategy;
+import cn.edu.xmu.aftersale.model.strategy.AftersaleProcessStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * 售后服务
  */
-<span class="fc" id="L18">@Slf4j</span>
+<span class="fc" id="L19">@Slf4j</span>
 @Service
 @RequiredArgsConstructor
 public class AftersaleService {
@@ -23,77 +24,88 @@ public class AftersaleService {
     private final AftersaleOrderRepository repository;
     private final List&lt;AftersaleConfirmStrategy&gt; confirmStrategies;
     private final List&lt;AftersaleCancelStrategy&gt; cancelStrategies;
+    private final List&lt;AftersaleAcceptStrategy&gt; acceptStrategies;
+    private final List&lt;AftersaleProcessStrategy&gt; processStrategies;
 
-    /**
-     * 商户审核售后单（多态实现）
-     */
+    /** 商户审核售后单 */
     @Transactional
     public String confirmAftersale(Long shopId, Long id, Boolean confirm, String conclusion) {
-<span class="fc" id="L32">        log.info(&quot;开始审核售后单: shopId={}, id={}, confirm={}&quot;, shopId, id, confirm);</span>
-        
-        // 1. 查询售后单
-<span class="fc" id="L35">        AftersaleOrder order = repository.findById(shopId, id);</span>
-        
-        // 2. 检查状态
-<span class="fc" id="L38">        order.checkPendingStatus();</span>
-        
-        // 3. 根据类型选择策略（多态）
-<span class="fc" id="L41">        AftersaleConfirmStrategy strategy = confirmStrategies.stream()</span>
-<span class="fc" id="L42">                .filter(s -&gt; s.support(order.getType()))</span>
-<span class="fc" id="L43">                .findFirst()</span>
-<span class="pc" id="L44">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的售后类型: &quot; + order.getType()));</span>
-        
-        // 4. 执行策略
-<span class="fc" id="L47">        strategy.confirm(order, confirm, conclusion);</span>
+<span class="fc" id="L33">        log.info(&quot;开始审核售后单: shopId={}, id={}, confirm={}&quot;, shopId, id, confirm);</span>
 
-        // 5. 如果策略未更新状态，兜底处理
-<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (AftersaleStatus.PENDING.equals(order.getStatus())) {</span>
-<span class="fc bfc" id="L51" title="All 2 branches covered.">            if (Boolean.TRUE.equals(confirm)) {</span>
-<span class="fc" id="L52">                order.approve(conclusion);</span>
-            } else {
-<span class="fc" id="L54">                order.reject(conclusion);</span>
-            }
-        }
-        
-        // 6. 保存更新
-<span class="fc" id="L59">        repository.save(order);</span>
-        
-<span class="fc" id="L61">        log.info(&quot;售后单审核完成: id={}, status={}&quot;, id, order.getStatus());</span>
-<span class="fc" id="L62">        return order.getStatus().getCode();</span>
+<span class="fc" id="L35">        AftersaleOrder order = repository.findById(shopId, id);</span>
+<span class="fc" id="L36">        order.checkPendingStatus();</span>
+
+<span class="fc" id="L38">        AftersaleConfirmStrategy strategy = confirmStrategies.stream()</span>
+<span class="fc" id="L39">                .filter(s -&gt; s.support(order.getType()))</span>
+<span class="fc" id="L40">                .findFirst()</span>
+<span class="pc" id="L41">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的售后类型: &quot; + order.getType()));</span>
+
+<span class="fc" id="L43">        strategy.confirm(order, confirm, conclusion);</span>
+
+<span class="fc" id="L45">        repository.save(order);</span>
+<span class="fc" id="L46">        log.info(&quot;售后单审核完成: id={}, status={}&quot;, id, order.getStatus());</span>
+<span class="fc" id="L47">        return order.getStatus().getCode();</span>
     }
 
-    /**
-     * 商户取消售后单（多态实现）
-     */
+    /** 商户验收（待验收 -&gt; 已验收/已拒绝） */
+    @Transactional
+    public String acceptAftersale(Long shopId, Long id, Boolean accept, String conclusion) {
+<span class="fc" id="L53">        log.info(&quot;开始验收售后单: shopId={}, id={}, accept={}&quot;, shopId, id, accept);</span>
+
+<span class="fc" id="L55">        AftersaleOrder order = repository.findById(shopId, id);</span>
+<span class="fc" id="L56">        order.checkCanReceive();</span>
+
+<span class="fc" id="L58">        AftersaleAcceptStrategy strategy = acceptStrategies.stream()</span>
+<span class="fc" id="L59">                .filter(s -&gt; s.support(order.getType()))</span>
+<span class="fc" id="L60">                .findFirst()</span>
+<span class="pc" id="L61">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的售后类型: &quot; + order.getType()));</span>
+
+<span class="fc" id="L63">        strategy.accept(order, accept, conclusion);</span>
+
+<span class="fc" id="L65">        repository.save(order);</span>
+<span class="fc" id="L66">        log.info(&quot;售后单验收完成: id={}, status={}&quot;, id, order.getStatus());</span>
+<span class="fc" id="L67">        return order.getStatus().getCode();</span>
+    }
+
+    /** 商户处理已验收商品（已验收 -&gt; 完成或发货） */
+    @Transactional
+    public String processReceivedAftersale(Long shopId, Long id, String conclusion) {
+<span class="fc" id="L73">        log.info(&quot;处理已验收售后单: shopId={}, id={}&quot;, shopId, id);</span>
+
+<span class="fc" id="L75">        AftersaleOrder order = repository.findById(shopId, id);</span>
+<span class="fc" id="L76">        order.checkCanProcessReceived();</span>
+
+<span class="fc" id="L78">        AftersaleProcessStrategy strategy = processStrategies.stream()</span>
+<span class="fc" id="L79">                .filter(s -&gt; s.support(order.getType()))</span>
+<span class="fc" id="L80">                .findFirst()</span>
+<span class="pc" id="L81">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的售后类型: &quot; + order.getType()));</span>
+
+<span class="fc" id="L83">        strategy.process(order, conclusion);</span>
+
+<span class="fc" id="L85">        repository.save(order);</span>
+<span class="fc" id="L86">        log.info(&quot;已验收处理完成: id={}, status={}&quot;, id, order.getStatus());</span>
+<span class="fc" id="L87">        return order.getStatus().getCode();</span>
+    }
+
+    /** 商户取消售后单 */
     @Transactional
     public String cancelAftersale(Long shopId, Long id, String reason) {
-<span class="fc" id="L70">        log.info(&quot;开始取消售后单: shopId={}, id={}, reason={}&quot;, shopId, id, reason);</span>
-        
-        // 1. 查询售后单
-<span class="fc" id="L73">        AftersaleOrder order = repository.findById(shopId, id);</span>
-        
-        // 2. 检查状态
-<span class="fc" id="L76">        order.checkApprovedStatus();</span>
-        
-        // 3. 根据类型选择策略（多态）
-<span class="fc" id="L79">        AftersaleCancelStrategy strategy = cancelStrategies.stream()</span>
-<span class="fc" id="L80">                .filter(s -&gt; s.support(order.getType()))</span>
-<span class="fc" id="L81">                .findFirst()</span>
-<span class="pc" id="L82">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的售后类型: &quot; + order.getType()));</span>
-        
-        // 4. 执行策略
-<span class="fc" id="L85">        strategy.cancel(order, reason);</span>
+<span class="fc" id="L93">        log.info(&quot;开始取消售后单: shopId={}, id={}, reason={}&quot;, shopId, id, reason);</span>
 
-        // 5. 如果策略未更新状态，兜底取消
-<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (!AftersaleStatus.CANCELLED.equals(order.getStatus())) {</span>
-<span class="fc" id="L89">            order.cancel();</span>
-        }
-        
-        // 6. 保存更新
-<span class="fc" id="L93">        repository.save(order);</span>
-        
-<span class="fc" id="L95">        log.info(&quot;售后单取消完成: id={}, status={}&quot;, id, order.getStatus());</span>
-<span class="fc" id="L96">        return order.getStatus().getCode();</span>
+<span class="fc" id="L95">        AftersaleOrder order = repository.findById(shopId, id);</span>
+<span class="fc" id="L96">        order.checkCanCancel();</span>
+
+<span class="fc" id="L98">        AftersaleCancelStrategy strategy = cancelStrategies.stream()</span>
+<span class="fc" id="L99">                .filter(s -&gt; s.support(order.getType()))</span>
+<span class="fc" id="L100">                .findFirst()</span>
+<span class="pc" id="L101">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;不支持的售后类型: &quot; + order.getType()));</span>
+
+<span class="fc" id="L103">        strategy.cancel(order, reason);</span>
+
+<span class="fc" id="L105">        repository.save(order);</span>
+<span class="fc" id="L106">        log.info(&quot;售后单取消完成: id={}, status={}&quot;, id, order.getStatus());</span>
+<span class="fc" id="L107">        return order.getStatus().getCode();</span>
     }
 }
+
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

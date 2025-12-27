@@ -1,48 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MailInCancelStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.model.strategy.impl</a> &gt; <span class="el_source">MailInCancelStrategy.java</span></div><h1>MailInCancelStrategy.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.model.strategy.impl;
 
+import cn.edu.xmu.javaee.core.model.InternalReturnObject;
+import cn.edu.xmu.service.client.LogisticsClient;
+import cn.edu.xmu.service.client.dto.CreatePackageRequest;
+import cn.edu.xmu.service.client.dto.CreatePackageResponse;
 import cn.edu.xmu.service.model.ServiceOrder;
+import cn.edu.xmu.service.model.ServiceOrderStatus;
 import cn.edu.xmu.service.model.ServiceOrderType;
 import cn.edu.xmu.service.model.strategy.ServiceOrderCancelStrategy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * 寄修取消策略
- * 取消时需要处理物流和退货
+ * 取消时需要取消对应的运单；若已收件，还需生成返件运单
  */
-<span class="fc" id="L13">@Slf4j</span>
+<span class="fc" id="L21">@Slf4j</span>
 @Component
-<span class="fc" id="L15">public class MailInCancelStrategy implements ServiceOrderCancelStrategy {</span>
+@RequiredArgsConstructor
+public class MailInCancelStrategy implements ServiceOrderCancelStrategy {
+
+    private final LogisticsClient logisticsClient;
 
     @Override
     public void cancel(ServiceOrder order) {
-<span class="fc" id="L19">        log.info(&quot;执行寄修取消策略: orderId={}&quot;, order.getId());</span>
-        
+<span class="fc" id="L30">        log.info(&quot;执行寄修取消策略: orderId={}, status={}&quot;, order.getId(), order.getStatus());</span>
+<span class="fc" id="L31">        ServiceOrderStatus beforeStatus = order.getStatus();</span>
+
         // 取消服务单
-<span class="fc" id="L22">        order.cancel();</span>
+<span class="fc" id="L34">        order.cancel();</span>
         
         // 寄修取消特定逻辑
-<span class="fc" id="L25">        log.info(&quot;寄修服务单已取消: orderId={}&quot;, order.getId());</span>
+<span class="fc" id="L37">        log.info(&quot;寄修服务单已取消: orderId={}&quot;, order.getId());</span>
         
-        // 根据物流状态判断后续处理
-<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (order.getTrackingNumber() != null) {</span>
-<span class="fc" id="L29">            log.info(&quot;商品已寄出，物流单号: {}&quot;, order.getTrackingNumber());</span>
-<span class="fc" id="L30">            log.info(&quot;后续需要: 1.拦截物流 2.安排退回 3.通知客户&quot;);</span>
+        // 根据当前状态判断是否需要额外操作
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (ServiceOrderStatus.RECEIVED.equals(beforeStatus)) {</span>
+<span class="fc" id="L41">            log.info(&quot;商品已收件，后续需要: 1.安排返件 2.通知客户&quot;);</span>
+            // 已收件：先生成返件运单
+<span class="fc" id="L43">            Long returnExpressId = createReturnPackage(order);</span>
+<span class="fc" id="L44">            order.setReturnExpressId(returnExpressId);</span>
+<span class="fc" id="L45">            log.info(&quot;返件运单创建成功: orderId={}, returnExpressId={}&quot;, order.getId(), returnExpressId);</span>
+
+            // 仍尝试取消原寄件运单（如果有）
+<span class="fc bfc" id="L48" title="All 2 branches covered.">            if (order.getExpressId() != null) {</span>
+<span class="fc" id="L49">                cancelExpressPackage(order);</span>
+            }
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        } else if (order.getExpressId() != null) {</span>
+            // 商品在途中，需要取消运单
+<span class="fc" id="L53">            log.info(&quot;商品在途中，运单ID: {}, 需要取消运单&quot;, order.getExpressId());</span>
+<span class="fc" id="L54">            cancelExpressPackage(order);</span>
         } else {
-<span class="fc" id="L32">            log.info(&quot;商品未寄出，直接通知客户取消即可&quot;);</span>
+<span class="fc" id="L56">            log.info(&quot;商品未寄出，直接通知客户取消即可&quot;);</span>
         }
-        
-        // 实际业务中可能需要：
-        // 1. 检查物流状态
-        // 2. 如果商品在途中，联系物流拦截
-        // 3. 如果商品已到达，安排退回
-        // 4. 通知客户取消信息
-        // 5. 处理可能产生的物流费用
-<span class="fc" id="L41">    }</span>
+<span class="fc" id="L58">    }</span>
 
     @Override
     public boolean support(Integer type) {
-<span class="fc" id="L45">        return ServiceOrderType.MAIL_IN_REPAIR.getCode().equals(type);</span>
+<span class="fc" id="L62">        return ServiceOrderType.MAIL_IN_REPAIR.getCode().equals(type);</span>
+    }
+    
+    /**
+     * 取消运单
+     */
+    private void cancelExpressPackage(ServiceOrder order) {
+        try {
+<span class="fc" id="L70">            log.info(&quot;准备取消运单: expressId={}&quot;, order.getExpressId());</span>
+            
+            // 调用物流API取消运单
+<span class="fc" id="L73">            logisticsClient.cancelPackage(</span>
+<span class="fc" id="L74">                    1L,  // shopId，实际应该从服务单获取</span>
+<span class="fc" id="L75">                    order.getExpressId(),</span>
+                    &quot;Bearer token&quot;  // 实际应该从上下文获取
+            );
+            
+<span class="fc" id="L79">            log.info(&quot;运单取消成功: expressId={}&quot;, order.getExpressId());</span>
+<span class="fc" id="L80">        } catch (Exception e) {</span>
+<span class="fc" id="L81">            log.error(&quot;取消运单失败: expressId={}&quot;, order.getExpressId(), e);</span>
+<span class="fc" id="L82">            throw new RuntimeException(&quot;取消运单失败: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L83">        }</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * 已收件时创建返件运单（服务商寄回给客户）
+     */
+    private Long createReturnPackage(ServiceOrder order) {
+        try {
+<span class="fc" id="L91">            CreatePackageRequest.AddressInfo address = CreatePackageRequest.AddressInfo.builder()</span>
+<span class="fc" id="L92">                    .name(order.getConsignee())</span>
+<span class="fc" id="L93">                    .mobile(order.getMobile())</span>
+<span class="fc" id="L94">                    .regionId(order.getRegionId())</span>
+<span class="fc" id="L95">                    .address(order.getAddress())</span>
+<span class="fc" id="L96">                    .build();</span>
+
+<span class="fc" id="L98">            CreatePackageRequest.CargoDetail cargo = CreatePackageRequest.CargoDetail.builder()</span>
+<span class="fc" id="L99">                    .id(order.getProductId())</span>
+<span class="fc" id="L100">                    .name(&quot;返件商品&quot;)</span>
+<span class="fc" id="L101">                    .count(1)</span>
+<span class="fc" id="L102">                    .unit(&quot;件&quot;)</span>
+<span class="fc" id="L103">                    .weight(1000)</span>
+<span class="fc" id="L104">                    .amount(0)</span>
+<span class="fc" id="L105">                    .build();</span>
+
+<span class="fc" id="L107">            CreatePackageRequest request = CreatePackageRequest.builder()</span>
+<span class="fc" id="L108">                    .contractId(0L)</span>
+<span class="fc" id="L109">                    .payMethod(2) // 收方付，服务商承担运费</span>
+<span class="fc" id="L110">                    .address(address)</span>
+<span class="fc" id="L111">                    .cargoDetails(List.of(cargo))</span>
+<span class="fc" id="L112">                    .build();</span>
+
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">            Long shopId = order.getServiceProviderId() != null ? order.getServiceProviderId() : 1L;</span>
+<span class="fc" id="L115">            InternalReturnObject&lt;CreatePackageResponse&gt; response =</span>
+<span class="fc" id="L116">                    logisticsClient.createPackage(shopId, &quot;Bearer token&quot;, request);</span>
+<span class="fc" id="L117">            CreatePackageResponse data = response.getData();</span>
+<span class="fc" id="L118">            return data.getId();</span>
+<span class="fc" id="L119">        } catch (Exception e) {</span>
+<span class="fc" id="L120">            log.error(&quot;创建返件运单失败: orderId={}&quot;, order.getId(), e);</span>
+<span class="fc" id="L121">            throw new RuntimeException(&quot;创建返件运单失败: &quot; + e.getMessage(), e);</span>
+        }
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

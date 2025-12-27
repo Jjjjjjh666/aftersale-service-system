@@ -1,84 +1,135 @@
 package cn.edu.xmu.service.model.strategy;
 
+import cn.edu.xmu.service.client.LogisticsClient;
 import cn.edu.xmu.service.model.ServiceOrder;
 import cn.edu.xmu.service.model.ServiceOrderStatus;
 import cn.edu.xmu.service.model.ServiceOrderType;
-import cn.edu.xmu.service.model.strategy.impl.MailInAcceptStrategy;
 import cn.edu.xmu.service.model.strategy.impl.MailInCancelStrategy;
-import cn.edu.xmu.service.model.strategy.impl.OnsiteAcceptStrategy;
+import cn.edu.xmu.service.model.strategy.impl.MailInCompleteStrategy;
 import cn.edu.xmu.service.model.strategy.impl.OnsiteCancelStrategy;
+import cn.edu.xmu.service.model.strategy.impl.OnsiteCompleteStrategy;
+import cn.edu.xmu.service.client.dto.CreatePackageResponse;
+import cn.edu.xmu.javaee.core.model.InternalReturnObject;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class ServiceOrderStrategyTest {
 
-    private final OnsiteAcceptStrategy onsiteAcceptStrategy = new OnsiteAcceptStrategy();
-    private final OnsiteCancelStrategy onsiteCancelStrategy = new OnsiteCancelStrategy();
-    private final MailInAcceptStrategy mailInAcceptStrategy = new MailInAcceptStrategy();
-    private final MailInCancelStrategy mailInCancelStrategy = new MailInCancelStrategy();
+    @Mock
+    private LogisticsClient logisticsClient;
 
-    @Test
-    void onsiteAcceptShouldAssignProviderAndChangeStatus() {
-        ServiceOrder order = ServiceOrder.builder()
-                .id(1L)
-                .status(ServiceOrderStatus.CREATED)
-                .build();
+    private OnsiteCompleteStrategy onsiteCompleteStrategy;
+    private MailInCompleteStrategy mailInCompleteStrategy;
+    private OnsiteCancelStrategy onsiteCancelStrategy;
+    private MailInCancelStrategy mailInCancelStrategy;
 
-        onsiteAcceptStrategy.accept(order, 88L);
-
-        assertEquals(88L, order.getServiceProviderId());
-        assertEquals(ServiceOrderStatus.ACCEPTED, order.getStatus());
-        assertTrue(onsiteAcceptStrategy.support(ServiceOrderType.ONSITE_REPAIR.getCode()));
-        assertFalse(onsiteAcceptStrategy.support(ServiceOrderType.MAIL_IN_REPAIR.getCode()));
+    @BeforeEach
+    void setUp() {
+        onsiteCompleteStrategy = new OnsiteCompleteStrategy();
+        mailInCompleteStrategy = new MailInCompleteStrategy();
+        onsiteCancelStrategy = new OnsiteCancelStrategy();
+        mailInCancelStrategy = new MailInCancelStrategy(logisticsClient);  // 注入Mock
     }
 
     @Test
-    void onsiteCancelShouldMarkOrderCancelled() {
+    void onsiteCompleteStrategyShouldCompleteWhenSupported() {
         ServiceOrder order = ServiceOrder.builder()
-                .id(2L)
-                .status(ServiceOrderStatus.ACCEPTED)
+                .id(1L)
+                .type(ServiceOrderType.ONSITE_REPAIR.getCode())
+                .status(ServiceOrderStatus.ASSIGNED)
                 .build();
 
-        onsiteCancelStrategy.cancel(order);
+        onsiteCompleteStrategy.complete(order);
 
-        assertEquals(ServiceOrderStatus.CANCELLED, order.getStatus());
+        assertEquals(ServiceOrderStatus.COMPLETED, order.getStatus());
+        assertTrue(onsiteCompleteStrategy.support(ServiceOrderType.ONSITE_REPAIR.getCode(),
+                ServiceOrderStatus.ASSIGNED.ordinal()));
+        assertFalse(onsiteCompleteStrategy.support(ServiceOrderType.MAIL_IN_REPAIR.getCode(),
+                ServiceOrderStatus.ASSIGNED.ordinal()));
+    }
+
+    @Test
+    void mailInCompleteStrategyShouldCompleteWhenReceived() {
+        ServiceOrder order = ServiceOrder.builder()
+                .id(2L)
+                .type(ServiceOrderType.MAIL_IN_REPAIR.getCode())
+                .status(ServiceOrderStatus.RECEIVED)
+                .build();
+
+        mailInCompleteStrategy.complete(order);
+
+        assertEquals(ServiceOrderStatus.COMPLETED, order.getStatus());
+        assertTrue(mailInCompleteStrategy.support(ServiceOrderType.MAIL_IN_REPAIR.getCode(),
+                ServiceOrderStatus.RECEIVED.ordinal()));
+        assertFalse(mailInCompleteStrategy.support(ServiceOrderType.ONSITE_REPAIR.getCode(),
+                ServiceOrderStatus.RECEIVED.ordinal()));
+    }
+
+    @Test
+    void onsiteCancelStrategyShouldCancelRegardlessOfStaffAssignment() {
+        ServiceOrder withStaff = ServiceOrder.builder()
+                .id(3L)
+                .type(ServiceOrderType.ONSITE_REPAIR.getCode())
+                .status(ServiceOrderStatus.ASSIGNED)
+                .serviceStaffId(9L)
+                .build();
+        ServiceOrder withoutStaff = ServiceOrder.builder()
+                .id(4L)
+                .type(ServiceOrderType.ONSITE_REPAIR.getCode())
+                .status(ServiceOrderStatus.TO_BE_ASSIGNED)
+                .build();
+
+        onsiteCancelStrategy.cancel(withStaff);
+        onsiteCancelStrategy.cancel(withoutStaff);
+
+        assertEquals(ServiceOrderStatus.CANCELED, withStaff.getStatus());
+        assertEquals(ServiceOrderStatus.CANCELED, withoutStaff.getStatus());
         assertTrue(onsiteCancelStrategy.support(ServiceOrderType.ONSITE_REPAIR.getCode()));
         assertFalse(onsiteCancelStrategy.support(ServiceOrderType.MAIL_IN_REPAIR.getCode()));
     }
 
     @Test
-    void mailInAcceptShouldSetAddressAndAccept() {
-        ServiceOrder order = ServiceOrder.builder()
-                .id(3L)
-                .status(ServiceOrderStatus.CREATED)
-                .build();
-
-        mailInAcceptStrategy.accept(order, 99L);
-
-        assertEquals(ServiceOrderStatus.ACCEPTED, order.getStatus());
-        assertNotNull(order.getAddress());
-        assertTrue(order.getAddress().contains("维修中心"));
-        assertTrue(mailInAcceptStrategy.support(ServiceOrderType.MAIL_IN_REPAIR.getCode()));
-    }
-
-    @Test
-    void mailInCancelShouldHandleTrackingNumberBranches() {
-        ServiceOrder withTracking = ServiceOrder.builder()
-                .id(4L)
-                .status(ServiceOrderStatus.ACCEPTED)
-                .trackingNumber("TN123")
-                .build();
-        ServiceOrder withoutTracking = ServiceOrder.builder()
+    void mailInCancelStrategyShouldCoverAllBranches() {
+        ServiceOrder receivedOrder = ServiceOrder.builder()
                 .id(5L)
-                .status(ServiceOrderStatus.ACCEPTED)
+                .type(ServiceOrderType.MAIL_IN_REPAIR.getCode())
+                .status(ServiceOrderStatus.RECEIVED)
+                .build();
+        ServiceOrder shippingOrder = ServiceOrder.builder()
+                .id(6L)
+                .type(ServiceOrderType.MAIL_IN_REPAIR.getCode())
+                .status(ServiceOrderStatus.ASSIGNED)
+                .expressId(66L)
+                .build();
+        ServiceOrder idleOrder = ServiceOrder.builder()
+                .id(7L)
+                .type(ServiceOrderType.MAIL_IN_REPAIR.getCode())
+                .status(ServiceOrderStatus.TO_BE_ASSIGNED)
                 .build();
 
-        mailInCancelStrategy.cancel(withTracking);
-        mailInCancelStrategy.cancel(withoutTracking);
+        InternalReturnObject<CreatePackageResponse> createReturn = new InternalReturnObject<>();
+        createReturn.setErrno(ReturnNo.OK.getErrNo());
+        createReturn.setData(new CreatePackageResponse(904L, "RT-BRANCH", 2, 0));
+        when(logisticsClient.createPackage(anyLong(), anyString(), any())).thenReturn(createReturn);
 
-        assertEquals(ServiceOrderStatus.CANCELLED, withTracking.getStatus());
-        assertEquals(ServiceOrderStatus.CANCELLED, withoutTracking.getStatus());
+        mailInCancelStrategy.cancel(receivedOrder);
+        mailInCancelStrategy.cancel(shippingOrder);
+        mailInCancelStrategy.cancel(idleOrder);
+
+        assertEquals(ServiceOrderStatus.CANCELED, receivedOrder.getStatus());
+        assertEquals(ServiceOrderStatus.CANCELED, shippingOrder.getStatus());
+        assertEquals(ServiceOrderStatus.CANCELED, idleOrder.getStatus());
         assertTrue(mailInCancelStrategy.support(ServiceOrderType.MAIL_IN_REPAIR.getCode()));
         assertFalse(mailInCancelStrategy.support(ServiceOrderType.ONSITE_REPAIR.getCode()));
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceProviderDraft.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.model</a> &gt; <span class="el_source">ServiceProviderDraft.java</span></div><h1>ServiceProviderDraft.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.model;
 
-import cn.edu.xmu.common.exception.BusinessException;
-import cn.edu.xmu.common.model.ReturnNo;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
 import cn.edu.xmu.service.dao.po.ServiceProviderDraftPo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -96,6 +96,33 @@ public class ServiceProviderDraft {
 <span class="fc" id="L96">        this.opinion = opinion;</span>
 <span class="fc" id="L97">        this.updatedAt = LocalDateTime.now();</span>
 <span class="fc" id="L98">    }</span>
+
+    /**
+     * 将草稿内容应用到正式的服务商对象
+     * @param provider 目标服务商
+     * @throws IllegalArgumentException 服务商ID不匹配
+     * @throws IllegalStateException 草稿未审核通过
+     */
+    public void applyTo(ServiceProvider provider) {
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (provider == null) {</span>
+<span class="nc" id="L108">            throw new IllegalArgumentException(&quot;服务商对象不能为空&quot;);</span>
+        }
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        if (!this.serviceProviderId.equals(provider.getId())) {</span>
+<span class="fc" id="L111">            throw new IllegalArgumentException(String.format(</span>
+                    &quot;草稿关联的服务商ID(%d)与传入的服务商ID(%d)不匹配&quot;,
+<span class="fc" id="L113">                    this.serviceProviderId, provider.getId()));</span>
+        }
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if (!DraftStatus.APPROVED.equals(this.status)) {</span>
+<span class="fc" id="L116">            throw new IllegalStateException(&quot;只有审核通过的草稿才能应用到正式服务商&quot;);</span>
+        }
+
+<span class="fc" id="L119">        provider.updateInfo(</span>
+                this.providerName,
+                this.contactPerson,
+                this.address,
+                this.contactPhone
+        );
+<span class="fc" id="L125">    }</span>
 }
 
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

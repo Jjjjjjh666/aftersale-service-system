@@ -11,10 +11,13 @@ public interface ServiceOrderMapper {
 
     /**
      * 插入服务单
-     * 注意：数据库字段是 created_at/updated_at，不是 gmt_create/gmt_modified
      */
-    @Insert("INSERT INTO service_order (shop_id, aftersales_id, service_provider_id, type, status, consignee, address, tracking_number, created_at, updated_at) " +
-            "VALUES (#{shopId}, #{aftersalesId}, #{serviceProviderId}, #{type}, #{status}, #{consignee}, #{address}, #{trackingNumber}, #{createdAt}, #{updatedAt})")
+    @Insert("INSERT INTO service_order (type, consignee, address, mobile, status, description, " +
+            "service_staff_id, service_provider_id, service_contract_id, service_id, " +
+            "customer_id, region_id, product_id, aftersale_id, express_id, return_express_id, created_at, updated_at) " +
+            "VALUES (#{type}, #{consignee}, #{address}, #{mobile}, #{status}, #{description}, " +
+            "#{serviceStaffId}, #{serviceProviderId}, #{serviceContractId}, #{serviceId}, " +
+            "#{customerId}, #{regionId}, #{productId}, #{aftersaleId}, #{expressId}, #{returnExpressId}, #{createdAt}, #{updatedAt})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(ServiceOrderPo po);
 
@@ -24,14 +27,22 @@ public interface ServiceOrderMapper {
     @Select("SELECT * FROM service_order WHERE id = #{id}")
     @Results({
             @Result(property = "id", column = "id"),
-            @Result(property = "shopId", column = "shop_id"),
-            @Result(property = "aftersalesId", column = "aftersales_id"),
-            @Result(property = "serviceProviderId", column = "service_provider_id"),
             @Result(property = "type", column = "type"),
-            @Result(property = "status", column = "status"),
             @Result(property = "consignee", column = "consignee"),
             @Result(property = "address", column = "address"),
-            @Result(property = "trackingNumber", column = "tracking_number"),
+            @Result(property = "mobile", column = "mobile"),
+            @Result(property = "status", column = "status"),
+            @Result(property = "description", column = "description"),
+            @Result(property = "serviceStaffId", column = "service_staff_id"),
+            @Result(property = "serviceProviderId", column = "service_provider_id"),
+            @Result(property = "serviceContractId", column = "service_contract_id"),
+            @Result(property = "serviceId", column = "service_id"),
+            @Result(property = "customerId", column = "customer_id"),
+            @Result(property = "regionId", column = "region_id"),
+            @Result(property = "productId", column = "product_id"),
+            @Result(property = "aftersaleId", column = "aftersale_id"),
+            @Result(property = "expressId", column = "express_id"),
+            @Result(property = "returnExpressId", column = "return_express_id"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at")
     })
@@ -40,15 +51,39 @@ public interface ServiceOrderMapper {
     /**
      * 根据售后单ID查询服务单
      */
-    @Select("SELECT * FROM service_order WHERE aftersales_id = #{aftersalesId}")
-    ServiceOrderPo findByAftersalesId(@Param("aftersalesId") Long aftersalesId);
+    @Select("SELECT * FROM service_order WHERE aftersale_id = #{aftersaleId}")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "type", column = "type"),
+            @Result(property = "consignee", column = "consignee"),
+            @Result(property = "address", column = "address"),
+            @Result(property = "mobile", column = "mobile"),
+            @Result(property = "status", column = "status"),
+            @Result(property = "description", column = "description"),
+            @Result(property = "serviceStaffId", column = "service_staff_id"),
+            @Result(property = "serviceProviderId", column = "service_provider_id"),
+            @Result(property = "serviceContractId", column = "service_contract_id"),
+            @Result(property = "serviceId", column = "service_id"),
+            @Result(property = "customerId", column = "customer_id"),
+            @Result(property = "regionId", column = "region_id"),
+            @Result(property = "productId", column = "product_id"),
+            @Result(property = "aftersaleId", column = "aftersale_id"),
+            @Result(property = "expressId", column = "express_id"),
+            @Result(property = "returnExpressId", column = "return_express_id"),
+            @Result(property = "createdAt", column = "created_at"),
+            @Result(property = "updatedAt", column = "updated_at")
+    })
+    ServiceOrderPo findByAftersaleId(@Param("aftersaleId") Long aftersaleId);
 
     /**
-     * 更新服务单状态
-     * 注意：数据库字段是 updated_at，不是 gmt_modified
+     * 更新服务单
      */
-    @Update("UPDATE service_order SET service_provider_id = #{serviceProviderId}, status = #{status}, " +
-            "address = #{address}, tracking_number = #{trackingNumber}, updated_at = #{updatedAt} " +
+    @Update("UPDATE service_order SET type = #{type}, consignee = #{consignee}, address = #{address}, " +
+            "mobile = #{mobile}, status = #{status}, description = #{description}, " +
+            "service_staff_id = #{serviceStaffId}, service_provider_id = #{serviceProviderId}, " +
+            "service_contract_id = #{serviceContractId}, service_id = #{serviceId}, " +
+            "customer_id = #{customerId}, region_id = #{regionId}, product_id = #{productId}, " +
+            "aftersale_id = #{aftersaleId}, express_id = #{expressId}, return_express_id = #{returnExpressId}, updated_at = #{updatedAt} " +
             "WHERE id = #{id}")
     int updateStatus(ServiceOrderPo po);
 }

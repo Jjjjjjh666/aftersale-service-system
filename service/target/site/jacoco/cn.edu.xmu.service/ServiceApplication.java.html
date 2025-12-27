@@ -2,15 +2,17 @@
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
  * 服务模块启动类
  */
-@SpringBootApplication(scanBasePackages = {&quot;cn.edu.xmu.service&quot;, &quot;cn.edu.xmu.common&quot;})
-<span class="nc" id="L10">public class ServiceApplication {</span>
+@SpringBootApplication(scanBasePackages = {&quot;cn.edu.xmu.service&quot;, &quot;cn.edu.xmu.javaee.core&quot;})
+@EnableFeignClients  // 启用OpenFeign
+<span class="fc" id="L12">public class ServiceApplication {</span>
     public static void main(String[] args) {
-<span class="nc" id="L12">        SpringApplication.run(ServiceApplication.class, args);</span>
-<span class="nc" id="L13">    }</span>
+<span class="nc" id="L14">        SpringApplication.run(ServiceApplication.class, args);</span>
+<span class="nc" id="L15">    }</span>
 }
 
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

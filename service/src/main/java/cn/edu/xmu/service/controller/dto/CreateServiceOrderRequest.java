@@ -9,6 +9,7 @@ import lombok.Data;
 public class CreateServiceOrderRequest {
     private Integer type;
     private ConsigneeInfo consignee;
+    private String address; // 联系人地址
 
     @Data
     public static class ConsigneeInfo {

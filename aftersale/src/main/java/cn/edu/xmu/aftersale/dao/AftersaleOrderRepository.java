@@ -2,11 +2,13 @@ package cn.edu.xmu.aftersale.dao;
 
 import cn.edu.xmu.aftersale.dao.po.AftersaleOrderPo;
 import cn.edu.xmu.aftersale.model.AftersaleOrder;
-import cn.edu.xmu.common.exception.BusinessException;
-import cn.edu.xmu.common.model.ReturnNo;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
 
 /**
  * 售后单仓储
@@ -45,6 +47,13 @@ public class AftersaleOrderRepository {
      * 创建售后单（用于测试）
      */
     public AftersaleOrder create(AftersaleOrder order) {
+        // 确保时间字段非空，避免 DB 非空约束报错
+        if (order.getCreatedAt() == null) {
+            order.setCreatedAt(LocalDateTime.now());
+        }
+        if (order.getUpdatedAt() == null) {
+            order.setUpdatedAt(order.getCreatedAt());
+        }
         AftersaleOrderPo po = order.toPo();
         mapper.insert(po);
         order.setId(po.getId());

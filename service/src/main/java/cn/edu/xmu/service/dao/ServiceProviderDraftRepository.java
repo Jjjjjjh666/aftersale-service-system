@@ -1,12 +1,14 @@
 package cn.edu.xmu.service.dao;
 
-import cn.edu.xmu.common.exception.BusinessException;
-import cn.edu.xmu.common.model.ReturnNo;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
 import cn.edu.xmu.service.dao.po.ServiceProviderDraftPo;
 import cn.edu.xmu.service.model.ServiceProviderDraft;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * 服务商草稿仓储
@@ -50,6 +52,27 @@ public class ServiceProviderDraftRepository {
         draft.setId(po.getId());
         log.info("服务商草稿创建成功: id={}", po.getId());
         return draft;
+    }
+
+    /**
+     * 条件查询草稿列表
+     */
+    public List<ServiceProviderDraft> search(String providerName, String contactPerson, String contactPhone,
+                                             String serviceArea, int page, int pageSize) {
+        int safePage = Math.max(page, 1);
+        int safePageSize = Math.max(pageSize, 1);
+        int offset = (safePage - 1) * safePageSize;
+        return mapper.search(providerName, contactPerson, contactPhone, serviceArea, offset, safePageSize)
+                .stream()
+                .map(ServiceProviderDraft::fromPo)
+                .toList();
+    }
+
+    /**
+     * 统计查询结果数
+     */
+    public long count(String providerName, String contactPerson, String contactPhone, String serviceArea) {
+        return mapper.count(providerName, contactPerson, contactPhone, serviceArea);
     }
 }
 

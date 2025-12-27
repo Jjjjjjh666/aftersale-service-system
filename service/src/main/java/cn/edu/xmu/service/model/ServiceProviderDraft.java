@@ -1,7 +1,7 @@
 package cn.edu.xmu.service.model;
 
-import cn.edu.xmu.common.exception.BusinessException;
-import cn.edu.xmu.common.model.ReturnNo;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
 import cn.edu.xmu.service.dao.po.ServiceProviderDraftPo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -95,6 +95,33 @@ public class ServiceProviderDraft {
         this.status = DraftStatus.REJECTED;
         this.opinion = opinion;
         this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * 将草稿内容应用到正式的服务商对象
+     * @param provider 目标服务商
+     * @throws IllegalArgumentException 服务商ID不匹配
+     * @throws IllegalStateException 草稿未审核通过
+     */
+    public void applyTo(ServiceProvider provider) {
+        if (provider == null) {
+            throw new IllegalArgumentException("服务商对象不能为空");
+        }
+        if (!this.serviceProviderId.equals(provider.getId())) {
+            throw new IllegalArgumentException(String.format(
+                    "草稿关联的服务商ID(%d)与传入的服务商ID(%d)不匹配",
+                    this.serviceProviderId, provider.getId()));
+        }
+        if (!DraftStatus.APPROVED.equals(this.status)) {
+            throw new IllegalStateException("只有审核通过的草稿才能应用到正式服务商");
+        }
+
+        provider.updateInfo(
+                this.providerName,
+                this.contactPerson,
+                this.address,
+                this.contactPhone
+        );
     }
 }
 

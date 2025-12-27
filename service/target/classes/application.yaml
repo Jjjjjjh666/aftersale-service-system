@@ -8,13 +8,16 @@ management:
       show-values: always
     health:
       show-details: always
+  health:
+    redis:
+      enabled: false
 
 server:
   port: 8082
   tomcat:
     threads:
       max: 200
-      min-spare: 10a
+      min-spare: 10
     accept-count: 100
 
 spring:
@@ -50,6 +53,12 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+oomall:
+  core:
+    page-size:
+      max: 1000
+      default: 10
 
 logging:
   level:

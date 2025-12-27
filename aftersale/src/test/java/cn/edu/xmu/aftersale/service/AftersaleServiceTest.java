@@ -4,269 +4,203 @@ import cn.edu.xmu.aftersale.dao.AftersaleOrderRepository;
 import cn.edu.xmu.aftersale.model.AftersaleOrder;
 import cn.edu.xmu.aftersale.model.AftersaleStatus;
 import cn.edu.xmu.aftersale.model.AftersaleType;
-import cn.edu.xmu.aftersale.model.strategy.AftersaleCancelStrategy;
-import cn.edu.xmu.aftersale.model.strategy.AftersaleConfirmStrategy;
+import cn.edu.xmu.aftersale.model.strategy.*;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
- * 售后服务单元测试
- * 测试多态策略模式和状态转换
+ * 售后服务单元测试，验证策略选择、状态校验与返回值
  */
 class AftersaleServiceTest {
 
     @Mock
     private AftersaleOrderRepository repository;
-
     @Mock
-    private AftersaleConfirmStrategy returnStrategy;
-
+    private AftersaleConfirmStrategy exchangeConfirmStrategy;
     @Mock
-    private AftersaleConfirmStrategy exchangeStrategy;
-
+    private AftersaleConfirmStrategy returnConfirmStrategy;
     @Mock
-    private AftersaleConfirmStrategy repairStrategy;
-
+    private AftersaleConfirmStrategy repairConfirmStrategy;
     @Mock
-    private AftersaleCancelStrategy returnCancelStrategy;
-
+    private AftersaleAcceptStrategy exchangeAcceptStrategy;
+    @Mock
+    private AftersaleAcceptStrategy returnAcceptStrategy;
+    @Mock
+    private AftersaleProcessStrategy exchangeProcessStrategy;
+    @Mock
+    private AftersaleProcessStrategy returnProcessStrategy;
     @Mock
     private AftersaleCancelStrategy exchangeCancelStrategy;
-
+    @Mock
+    private AftersaleCancelStrategy returnCancelStrategy;
     @Mock
     private AftersaleCancelStrategy repairCancelStrategy;
 
-    @InjectMocks
     private AftersaleService aftersaleService;
-
-    private List<AftersaleConfirmStrategy> confirmStrategies;
-    private List<AftersaleCancelStrategy> cancelStrategies;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        
-        // 设置审核策略支持的类型
-        when(returnStrategy.support(0)).thenReturn(true);
-        when(exchangeStrategy.support(1)).thenReturn(true);
-        when(repairStrategy.support(2)).thenReturn(true);
-        
-        // 设置取消策略支持的类型
-        when(returnCancelStrategy.support(0)).thenReturn(true);
-        when(exchangeCancelStrategy.support(1)).thenReturn(true);
-        when(repairCancelStrategy.support(2)).thenReturn(true);
-        
-        confirmStrategies = Arrays.asList(returnStrategy, exchangeStrategy, repairStrategy);
-        cancelStrategies = Arrays.asList(returnCancelStrategy, exchangeCancelStrategy, repairCancelStrategy);
-        
-        aftersaleService = new AftersaleService(repository, confirmStrategies, cancelStrategies);
+
+        when(exchangeConfirmStrategy.support(AftersaleType.EXCHANGE.getCode())).thenReturn(true);
+        when(returnConfirmStrategy.support(AftersaleType.RETURN.getCode())).thenReturn(true);
+        when(repairConfirmStrategy.support(AftersaleType.REPAIR.getCode())).thenReturn(true);
+        when(exchangeCancelStrategy.support(AftersaleType.EXCHANGE.getCode())).thenReturn(true);
+        when(returnCancelStrategy.support(AftersaleType.RETURN.getCode())).thenReturn(true);
+        when(repairCancelStrategy.support(AftersaleType.REPAIR.getCode())).thenReturn(true);
+        when(exchangeAcceptStrategy.support(AftersaleType.EXCHANGE.getCode())).thenReturn(true);
+        when(returnAcceptStrategy.support(AftersaleType.RETURN.getCode())).thenReturn(true);
+        when(exchangeProcessStrategy.support(AftersaleType.EXCHANGE.getCode())).thenReturn(true);
+        when(returnProcessStrategy.support(AftersaleType.RETURN.getCode())).thenReturn(true);
+
+        stubConfirmStrategy(exchangeConfirmStrategy, AftersaleStatus.TO_BE_RECEIVED);
+        stubConfirmStrategy(returnConfirmStrategy, AftersaleStatus.TO_BE_RECEIVED);
+        stubConfirmStrategy(repairConfirmStrategy, AftersaleStatus.TO_BE_COMPLETED);
+
+        stubCancelStrategy(exchangeCancelStrategy);
+        stubCancelStrategy(returnCancelStrategy);
+        stubCancelStrategy(repairCancelStrategy);
+
+        stubAcceptStrategy(exchangeAcceptStrategy, true);
+        stubAcceptStrategy(returnAcceptStrategy, false);
+
+        doAnswer(invocation -> {
+            AftersaleOrder order = invocation.getArgument(0);
+            order.complete(invocation.getArgument(1));
+            return null;
+        }).when(exchangeProcessStrategy).process(any(), any());
+
+        doAnswer(invocation -> {
+            AftersaleOrder order = invocation.getArgument(0);
+            order.complete(invocation.getArgument(1));
+            return null;
+        }).when(returnProcessStrategy).process(any(), any());
+
+        aftersaleService = new AftersaleService(
+                repository,
+                List.of(exchangeConfirmStrategy, returnConfirmStrategy, repairConfirmStrategy),
+                List.of(exchangeCancelStrategy, returnCancelStrategy, repairCancelStrategy),
+                List.of(exchangeAcceptStrategy, returnAcceptStrategy),
+                List.of(exchangeProcessStrategy, returnProcessStrategy));
     }
 
     @Test
-    void testConfirmAftersale_Return() {
-        // 准备测试数据 - 退货类型
-        Long shopId = 1L;
-        Long id = 1L;
-        AftersaleOrder order = AftersaleOrder.builder()
-                .id(id)
-                .shopId(shopId)
-                .type(0)
-                .status(AftersaleStatus.PENDING)
-                .build();
+    void confirmAftersaleShouldReturnUpdatedStatus() {
+        AftersaleOrder order = buildOrder(AftersaleType.RETURN, AftersaleStatus.PENDING);
+        when(repository.findById(order.getShopId(), order.getId())).thenReturn(order);
 
-        // Mock行为
-        when(repository.findById(shopId, id)).thenReturn(order);
+        String status = aftersaleService.confirmAftersale(order.getShopId(), order.getId(), true, "同意退货");
 
-        // 执行测试
-        String result = aftersaleService.confirmAftersale(shopId, id, true, "同意退货");
-
-        // 验证结果
-        assertEquals("APPROVED", result);
-        verify(repository).findById(shopId, id);
-        verify(returnStrategy).confirm(eq(order), eq(true), eq("同意退货"));
-        verify(repository).save(order);
-        
-        // 验证只调用了退货策略
-        verify(exchangeStrategy, never()).confirm(any(), any(), any());
-        verify(repairStrategy, never()).confirm(any(), any(), any());
-    }
-
-    @Test
-    void testConfirmAftersale_Exchange() {
-        // 准备测试数据 - 换货类型
-        Long shopId = 1L;
-        Long id = 2L;
-        AftersaleOrder order = AftersaleOrder.builder()
-                .id(id)
-                .shopId(shopId)
-                .type(1)
-                .status(AftersaleStatus.PENDING)
-                .build();
-
-        // Mock行为
-        when(repository.findById(shopId, id)).thenReturn(order);
-
-        // 执行测试
-        String result = aftersaleService.confirmAftersale(shopId, id, true, "同意换货");
-
-        // 验证结果
-        assertEquals("APPROVED", result);
-        verify(repository).findById(shopId, id);
-        verify(exchangeStrategy).confirm(eq(order), eq(true), eq("同意换货"));
-        verify(repository).save(order);
-        
-        // 验证只调用了换货策略
-        verify(returnStrategy, never()).confirm(any(), any(), any());
-        verify(repairStrategy, never()).confirm(any(), any(), any());
-    }
-
-    @Test
-    void testConfirmAftersale_Repair() {
-        // 准备测试数据 - 维修类型
-        Long shopId = 1L;
-        Long id = 3L;
-        AftersaleOrder order = AftersaleOrder.builder()
-                .id(id)
-                .shopId(shopId)
-                .type(2)
-                .status(AftersaleStatus.PENDING)
-                .build();
-
-        // Mock行为
-        when(repository.findById(shopId, id)).thenReturn(order);
-
-        // 执行测试
-        String result = aftersaleService.confirmAftersale(shopId, id, true, "同意维修");
-
-        // 验证结果
-        assertEquals("APPROVED", result);
-        verify(repository).findById(shopId, id);
-        verify(repairStrategy).confirm(eq(order), eq(true), eq("同意维修"));
-        verify(repository).save(order);
-        
-        // 验证只调用了维修策略
-        verify(returnStrategy, never()).confirm(any(), any(), any());
-        verify(exchangeStrategy, never()).confirm(any(), any(), any());
-    }
-
-    @Test
-    void testConfirmAftersale_Reject() {
-        // 准备测试数据 - 拒绝审核
-        Long shopId = 1L;
-        Long id = 1L;
-        AftersaleOrder order = AftersaleOrder.builder()
-                .id(id)
-                .shopId(shopId)
-                .type(0)
-                .status(AftersaleStatus.PENDING)
-                .build();
-
-        // Mock行为
-        when(repository.findById(shopId, id)).thenReturn(order);
-
-        // 执行测试
-        String result = aftersaleService.confirmAftersale(shopId, id, false, "拒绝退货");
-
-        // 验证结果
-        verify(repository).findById(shopId, id);
-        verify(returnStrategy).confirm(eq(order), eq(false), eq("拒绝退货"));
+        assertEquals(AftersaleStatus.TO_BE_RECEIVED.getCode(), status);
+        verify(returnConfirmStrategy).confirm(eq(order), eq(true), eq("同意退货"));
         verify(repository).save(order);
     }
 
     @Test
-    void testCancelAftersale_Return() {
-        // 准备测试数据 - 取消退货
-        Long shopId = 1L;
-        Long id = 4L;
-        AftersaleOrder order = AftersaleOrder.builder()
-                .id(id)
-                .shopId(shopId)
-                .type(0)
-                .status(AftersaleStatus.APPROVED)
-                .build();
+    void acceptAftersaleShouldRouteToAcceptStrategy() {
+        AftersaleOrder order = buildOrder(AftersaleType.EXCHANGE, AftersaleStatus.TO_BE_RECEIVED);
+        when(repository.findById(order.getShopId(), order.getId())).thenReturn(order);
 
-        // Mock行为
-        when(repository.findById(shopId, id)).thenReturn(order);
+        String status = aftersaleService.acceptAftersale(order.getShopId(), order.getId(), true, "验收通过");
 
-        // 执行测试
-        String result = aftersaleService.cancelAftersale(shopId, id, "客户要求取消");
-
-        // 验证结果
-        assertEquals("CANCELLED", result);
-        verify(repository).findById(shopId, id);
-        verify(returnCancelStrategy).cancel(eq(order), eq("客户要求取消"));
-        verify(repository).save(order);
-        
-        // 验证只调用了退货取消策略
-        verify(exchangeCancelStrategy, never()).cancel(any(), any());
-        verify(repairCancelStrategy, never()).cancel(any(), any());
+        assertEquals(AftersaleStatus.RECEIVED.getCode(), status);
+        verify(exchangeAcceptStrategy).accept(eq(order), eq(true), eq("验收通过"));
     }
 
     @Test
-    void testCancelAftersale_Exchange() {
-        // 准备测试数据 - 取消换货
-        Long shopId = 1L;
-        Long id = 5L;
-        AftersaleOrder order = AftersaleOrder.builder()
-                .id(id)
-                .shopId(shopId)
-                .type(1)
-                .status(AftersaleStatus.APPROVED)
-                .build();
+    void processAfterReceivedShouldInvokeProcessStrategy() {
+        AftersaleOrder order = buildOrder(AftersaleType.RETURN, AftersaleStatus.RECEIVED);
+        when(repository.findById(order.getShopId(), order.getId())).thenReturn(order);
 
-        // Mock行为
-        when(repository.findById(shopId, id)).thenReturn(order);
+        String status = aftersaleService.processReceivedAftersale(order.getShopId(), order.getId(), "处理完成");
 
-        // 执行测试
-        String result = aftersaleService.cancelAftersale(shopId, id, "商品缺货");
-
-        // 验证结果
-        assertEquals("CANCELLED", result);
-        verify(repository).findById(shopId, id);
-        verify(exchangeCancelStrategy).cancel(eq(order), eq("商品缺货"));
-        verify(repository).save(order);
-        
-        // 验证只调用了换货取消策略
-        verify(returnCancelStrategy, never()).cancel(any(), any());
-        verify(repairCancelStrategy, never()).cancel(any(), any());
+        assertEquals(AftersaleStatus.COMPLETED.getCode(), status);
+        verify(returnProcessStrategy).process(eq(order), eq("处理完成"));
     }
 
     @Test
-    void testCancelAftersale_Repair() {
-        // 准备测试数据 - 取消维修（会调用service模块）
-        Long shopId = 1L;
-        Long id = 6L;
-        AftersaleOrder order = AftersaleOrder.builder()
-                .id(id)
-                .shopId(shopId)
-                .type(2)
-                .status(AftersaleStatus.APPROVED)
-                .build();
+    void confirmAftersaleShouldFailWhenStateIllegal() {
+        AftersaleOrder order = buildOrder(AftersaleType.RETURN, AftersaleStatus.CANCELLED);
+        when(repository.findById(order.getShopId(), order.getId())).thenReturn(order);
 
-        // Mock行为
-        when(repository.findById(shopId, id)).thenReturn(order);
+        assertThrows(BusinessException.class,
+                () -> aftersaleService.confirmAftersale(order.getShopId(), order.getId(), true, "invalid"));
+    }
 
-        // 执行测试
-        String result = aftersaleService.cancelAftersale(shopId, id, "服务商无法提供服务");
+    @Test
+    void cancelAftersaleShouldReturnNewStatus() {
+        AftersaleOrder order = buildOrder(AftersaleType.EXCHANGE, AftersaleStatus.TO_BE_RECEIVED);
+        when(repository.findById(order.getShopId(), order.getId())).thenReturn(order);
 
-        // 验证结果
-        assertEquals("CANCELLED", result);
-        verify(repository).findById(shopId, id);
-        verify(repairCancelStrategy).cancel(eq(order), eq("服务商无法提供服务"));
+        String status = aftersaleService.cancelAftersale(order.getShopId(), order.getId(), "库存不足");
+
+        assertEquals(AftersaleStatus.CANCELLED.getCode(), status);
+        verify(exchangeCancelStrategy).cancel(eq(order), eq("库存不足"));
         verify(repository).save(order);
-        
-        // 验证只调用了维修取消策略
-        verify(returnCancelStrategy, never()).cancel(any(), any());
-        verify(exchangeCancelStrategy, never()).cancel(any(), any());
+    }
+
+    private void stubConfirmStrategy(AftersaleConfirmStrategy strategy, AftersaleStatus passStatus) {
+        doAnswer(invocation -> {
+            AftersaleOrder order = invocation.getArgument(0);
+            Boolean confirm = invocation.getArgument(1);
+            String conclusion = invocation.getArgument(2);
+            if (Boolean.TRUE.equals(confirm)) {
+                if (passStatus == AftersaleStatus.TO_BE_COMPLETED) {
+                    order.approveToBeCompleted(conclusion);
+                } else {
+                    order.approveToBeReceived(conclusion);
+                }
+            } else {
+                order.reject(conclusion);
+            }
+            return null;
+        }).when(strategy).confirm(any(), any(), any());
+    }
+
+    private void stubCancelStrategy(AftersaleCancelStrategy strategy) {
+        doAnswer(invocation -> {
+            AftersaleOrder order = invocation.getArgument(0);
+            order.cancel();
+            return null;
+        }).when(strategy).cancel(any(), any());
+    }
+
+    private void stubAcceptStrategy(AftersaleAcceptStrategy strategy, boolean acceptedResult) {
+        doAnswer(invocation -> {
+            AftersaleOrder order = invocation.getArgument(0);
+            Boolean accept = invocation.getArgument(1);
+            String conclusion = invocation.getArgument(2);
+            if (Boolean.TRUE.equals(accept)) {
+                order.accept(conclusion);
+            } else {
+                order.reject(conclusion);
+            }
+            return null;
+        }).when(strategy).accept(any(), any(), any());
+        when(strategy.support(any())).thenReturn(acceptedResult);
+    }
+
+    private AftersaleOrder buildOrder(AftersaleType type, AftersaleStatus status) {
+        return buildOrder(type.getCode(), status);
+    }
+
+    private AftersaleOrder buildOrder(int type, AftersaleStatus status) {
+        return AftersaleOrder.builder()
+                .id(100L + type)
+                .shopId(200L)
+                .type(type)
+                .status(status)
+                .build();
     }
 }
 

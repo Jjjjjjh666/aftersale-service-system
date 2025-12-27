@@ -1,7 +1,7 @@
 package cn.edu.xmu.service.dao;
 
-import cn.edu.xmu.common.exception.BusinessException;
-import cn.edu.xmu.common.model.ReturnNo;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
 import cn.edu.xmu.service.dao.po.ServiceOrderPo;
 import cn.edu.xmu.service.model.ServiceOrder;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +50,17 @@ public class ServiceOrderRepository {
         order.setId(po.getId());
         log.info("服务单创建成功: id={}", po.getId());
         return order;
+    }
+
+    /**
+     * 根据售后单ID查询服务单
+     */
+    public ServiceOrder findByAftersaleId(Long aftersaleId) {
+        ServiceOrderPo po = mapper.findByAftersaleId(aftersaleId);
+        if (po == null) {
+            return null;
+        }
+        return ServiceOrder.fromPo(po);
     }
 }
 

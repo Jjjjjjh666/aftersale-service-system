@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceProviderOrderController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Service Module</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.service.controller</a> &gt; <span class="el_source">ServiceProviderOrderController.java</span></div><h1>ServiceProviderOrderController.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.service.controller;
 
-import cn.edu.xmu.common.model.ReturnNo;
-import cn.edu.xmu.common.model.ReturnObject;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.ReturnObject;
+import cn.edu.xmu.service.controller.dto.ConfirmServiceOrderRequest;
+import cn.edu.xmu.service.controller.dto.AssignServiceOrderRequest;
 import cn.edu.xmu.service.service.ServiceOrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -11,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 服务商服务单控制器
  */
-<span class="fc" id="L14">@Slf4j</span>
+<span class="fc" id="L17">@Slf4j</span>
 @RestController
 @RequestMapping(&quot;/serviceprovider/{did}/serviceorders&quot;)
 @RequiredArgsConstructor
@@ -21,19 +24,71 @@ public class ServiceProviderOrderController {
     private final ServiceOrderService serviceOrderService;
 
     /**
-     * 服务商接受服务单
-     * PUT /serviceprovider/{did}/serviceorders/{id}/accept
+     * 服务商审核服务单
+     * PUT /serviceprovider/{did}/serviceorders/{id}/confirm
      */
-    @PutMapping(&quot;/{id}/accept&quot;)
-    public ReturnObject acceptServiceOrder(
+    @PutMapping(&quot;/{id}/confirm&quot;)
+    public ReturnObject confirmServiceOrder(
+            @PathVariable(&quot;did&quot;) Long serviceProviderId,
+            @PathVariable(&quot;id&quot;) Long orderId,
+            @Valid @RequestBody ConfirmServiceOrderRequest request) {
+        
+<span class="fc" id="L36">        log.info(&quot;服务商审核服务单API: serviceProviderId={}, orderId={}, confirm={}&quot;, </span>
+<span class="fc" id="L37">                serviceProviderId, orderId, request.getConfirm());</span>
+        
+<span class="fc" id="L39">        serviceOrderService.confirmServiceOrder(serviceProviderId, orderId, request.getConfirm());</span>
+        
+<span class="fc" id="L41">        return new ReturnObject(ReturnNo.OK);</span>
+    }
+
+    /**
+     * 服务商派工
+     * PUT /serviceprovider/{did}/serviceorders/{id}/assign
+     */
+    @PutMapping(&quot;/{id}/assign&quot;)
+    public ReturnObject assignServiceOrder(
+            @PathVariable(&quot;did&quot;) Long serviceProviderId,
+            @PathVariable(&quot;id&quot;) Long orderId,
+            @Valid @RequestBody AssignServiceOrderRequest request) {
+        
+<span class="fc" id="L54">        log.info(&quot;服务商派工API: serviceProviderId={}, orderId={}, serviceStaffId={}&quot;, </span>
+<span class="fc" id="L55">                serviceProviderId, orderId, request.getServiceStaffId());</span>
+        
+<span class="fc" id="L57">        serviceOrderService.assignServiceOrder(serviceProviderId, orderId, request.getServiceStaffId());</span>
+        
+<span class="fc" id="L59">        return new ReturnObject(ReturnNo.OK);</span>
+    }
+
+    /**
+     * 验收寄修商品
+     * PUT /serviceprovider/{did}/serviceorders/{id}/receive
+     */
+    @PutMapping(&quot;/{id}/receive&quot;)
+    public ReturnObject receiveServiceOrder(
             @PathVariable(&quot;did&quot;) Long serviceProviderId,
             @PathVariable(&quot;id&quot;) Long orderId) {
         
-<span class="fc" id="L32">        log.info(&quot;服务商接受服务单API: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
+<span class="fc" id="L71">        log.info(&quot;验收寄修商品API: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
         
-<span class="fc" id="L34">        serviceOrderService.acceptServiceOrder(serviceProviderId, orderId);</span>
+<span class="fc" id="L73">        serviceOrderService.receiveServiceOrder(serviceProviderId, orderId);</span>
         
-<span class="fc" id="L36">        return new ReturnObject(ReturnNo.OK);</span>
+<span class="fc" id="L75">        return new ReturnObject(ReturnNo.OK);</span>
+    }
+
+    /**
+     * 完成服务单
+     * PUT /serviceprovider/{did}/serviceorders/{id}/complete
+     */
+    @PutMapping(&quot;/{id}/complete&quot;)
+    public ReturnObject completeServiceOrder(
+            @PathVariable(&quot;did&quot;) Long serviceProviderId,
+            @PathVariable(&quot;id&quot;) Long orderId) {
+        
+<span class="fc" id="L87">        log.info(&quot;完成服务单API: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
+        
+<span class="fc" id="L89">        serviceOrderService.completeServiceOrder(serviceProviderId, orderId);</span>
+        
+<span class="fc" id="L91">        return new ReturnObject(ReturnNo.OK);</span>
     }
 
     /**
@@ -45,11 +100,11 @@ public class ServiceProviderOrderController {
             @PathVariable(&quot;did&quot;) Long serviceProviderId,
             @PathVariable(&quot;id&quot;) Long orderId) {
         
-<span class="fc" id="L48">        log.info(&quot;服务商取消服务单API: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
+<span class="fc" id="L103">        log.info(&quot;服务商取消服务单API: serviceProviderId={}, orderId={}&quot;, serviceProviderId, orderId);</span>
         
-<span class="fc" id="L50">        serviceOrderService.cancelServiceOrder(serviceProviderId, orderId);</span>
+<span class="fc" id="L105">        serviceOrderService.cancelServiceOrder(serviceProviderId, orderId);</span>
         
-<span class="fc" id="L52">        return new ReturnObject(ReturnNo.OK);</span>
+<span class="fc" id="L107">        return new ReturnObject(ReturnNo.OK);</span>
     }
 }
 

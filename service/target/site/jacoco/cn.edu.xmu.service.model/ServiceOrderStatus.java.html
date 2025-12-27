@@ -5,26 +5,51 @@ import lombok.Getter;
 
 /**
  * 服务单状态枚举
+ * 0-PENDING-待接收
+ * 1-TO_BE_ASSIGNED-待派工
+ * 2-ASSIGNED-已派工
+ * 3-RECEIVED-已收件
+ * 4-REJECTED-已拒绝
+ * 5-COMPLETED-已完成
+ * 6-CANCELED-已取消
+ * 7-RETURNED-已退回
  */
-<span class="fc" id="L9">@Getter</span>
+<span class="fc" id="L17">@Getter</span>
 @AllArgsConstructor
 public enum ServiceOrderStatus {
-<span class="fc" id="L12">    CREATED(&quot;CREATED&quot;, &quot;已创建&quot;),</span>
-<span class="fc" id="L13">    ACCEPTED(&quot;ACCEPTED&quot;, &quot;已接受&quot;),</span>
-<span class="fc" id="L14">    IN_PROGRESS(&quot;IN_PROGRESS&quot;, &quot;进行中&quot;),</span>
-<span class="fc" id="L15">    COMPLETED(&quot;COMPLETED&quot;, &quot;已完成&quot;),</span>
-<span class="fc" id="L16">    CANCELLED(&quot;CANCELLED&quot;, &quot;已取消&quot;);</span>
+<span class="fc" id="L20">    PENDING(&quot;PENDING&quot;, &quot;待接收&quot;),</span>
+<span class="fc" id="L21">    TO_BE_ASSIGNED(&quot;TO_BE_ASSIGNED&quot;, &quot;待派工&quot;),</span>
+<span class="fc" id="L22">    ASSIGNED(&quot;ASSIGNED&quot;, &quot;已派工&quot;),</span>
+<span class="fc" id="L23">    RECEIVED(&quot;RECEIVED&quot;, &quot;已收件&quot;),</span>
+<span class="fc" id="L24">    REJECTED(&quot;REJECTED&quot;, &quot;已拒绝&quot;),</span>
+<span class="fc" id="L25">    COMPLETED(&quot;COMPLETED&quot;, &quot;已完成&quot;),</span>
+<span class="fc" id="L26">    CANCELED(&quot;CANCELED&quot;, &quot;已取消&quot;),</span>
+<span class="fc" id="L27">    RETURNED(&quot;RETURNED&quot;, &quot;已退回&quot;);</span>
 
     private final String code;
     private final String description;
 
     public static ServiceOrderStatus of(String code) {
-<span class="fc bfc" id="L22" title="All 2 branches covered.">        for (ServiceOrderStatus status : values()) {</span>
-<span class="fc bfc" id="L23" title="All 2 branches covered.">            if (status.getCode().equals(code)) {</span>
-<span class="fc" id="L24">                return status;</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        for (ServiceOrderStatus status : values()) {</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">            if (status.getCode().equals(code)) {</span>
+<span class="fc" id="L35">                return status;</span>
             }
         }
-<span class="fc" id="L27">        throw new IllegalArgumentException(&quot;未知的服务单状态: &quot; + code);</span>
+<span class="fc" id="L38">        throw new IllegalArgumentException(&quot;未知的服务单状态: &quot; + code);</span>
+    }
+    
+    /**
+     * 判断是否为终态
+     */
+    public boolean isTerminal() {
+<span class="pc bpc" id="L45" title="5 of 8 branches missed.">        return this == REJECTED || this == COMPLETED || this == CANCELED || this == RETURNED;</span>
+    }
+    
+    /**
+     * 判断是否可以取消
+     */
+    public boolean canCancel() {
+<span class="pc bpc" id="L52" title="1 of 8 branches missed.">        return this == PENDING || this == TO_BE_ASSIGNED || this == ASSIGNED || this == RECEIVED;</span>
     }
 }
 

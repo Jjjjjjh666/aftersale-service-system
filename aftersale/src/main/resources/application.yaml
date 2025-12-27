@@ -8,6 +8,9 @@ management:
       show-values: always
     health:
       show-details: always
+  health:
+    redis:
+      enabled: false
 
 server:
   port: 8081
@@ -54,6 +57,12 @@ mybatis:
 # 服务模块地址
 service:
   url: ${SERVICE_BASE_URL:http://127.0.0.1:8082}
+
+oomall:
+  core:
+    page-size:
+      max: 1000
+      default: 10
 
 logging:
   level:

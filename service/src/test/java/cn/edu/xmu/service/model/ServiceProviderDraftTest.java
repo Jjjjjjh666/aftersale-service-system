@@ -1,6 +1,6 @@
 package cn.edu.xmu.service.model;
 
-import cn.edu.xmu.common.exception.BusinessException;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
 import cn.edu.xmu.service.dao.po.ServiceProviderDraftPo;
 import org.junit.jupiter.api.Test;
 
@@ -73,5 +73,54 @@ class ServiceProviderDraftTest {
         draft.reject("拒绝");
         assertEquals(DraftStatus.REJECTED, draft.getStatus());
         assertEquals("拒绝", draft.getOpinion());
+    }
+
+    @Test
+    void applyToShouldUpdateProviderWhenApprovedAndIdMatch() {
+        ServiceProviderDraft draft = ServiceProviderDraft.builder()
+                .id(1L)
+                .serviceProviderId(10L)
+                .providerName("新名称")
+                .contactPerson("联系人A")
+                .contactPhone("13800000000")
+                .address("新地址")
+                .status(DraftStatus.APPROVED)
+                .build();
+        ServiceProvider provider = ServiceProvider.builder()
+                .id(10L)
+                .name("旧名称")
+                .consignee("旧联系人")
+                .mobile("旧电话")
+                .address("旧地址")
+                .build();
+
+        draft.applyTo(provider);
+
+        assertEquals("新名称", provider.getName());
+        assertEquals("联系人A", provider.getConsignee());
+        assertEquals("新地址", provider.getAddress());
+        assertEquals("13800000000", provider.getMobile());
+    }
+
+    @Test
+    void applyToShouldThrowWhenIdMismatch() {
+        ServiceProviderDraft draft = ServiceProviderDraft.builder()
+                .serviceProviderId(10L)
+                .status(DraftStatus.APPROVED)
+                .build();
+        ServiceProvider provider = ServiceProvider.builder().id(11L).build();
+
+        assertThrows(IllegalArgumentException.class, () -> draft.applyTo(provider));
+    }
+
+    @Test
+    void applyToShouldThrowWhenNotApproved() {
+        ServiceProviderDraft draft = ServiceProviderDraft.builder()
+                .serviceProviderId(10L)
+                .status(DraftStatus.PENDING)
+                .build();
+        ServiceProvider provider = ServiceProvider.builder().id(10L).build();
+
+        assertThrows(IllegalStateException.class, () -> draft.applyTo(provider));
     }
 }

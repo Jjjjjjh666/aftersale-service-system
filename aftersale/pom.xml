@@ -16,10 +16,10 @@
     <description>售后模块</description>
 
     <dependencies>
-        <!-- 依赖公共模块 -->
+        <!-- 依赖core模块 -->
         <dependency>
-            <groupId>cn.edu.xmu</groupId>
-            <artifactId>common</artifactId>
+            <groupId>cn.edu.xmu.javaee</groupId>
+            <artifactId>core</artifactId>
         </dependency>
 
         <dependency>
